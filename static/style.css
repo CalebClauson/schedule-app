@@ -1,0 +1,41 @@
+/*body = main site look*
+/*.page = spacing*
+/*.card = boxes*
+/*.button = buttons/links*
+/*input = login/forms*
+
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+}
+
+.page {
+    padding: 30px;
+}
+
+.card {
+    background: #1f2937;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+button,
+.button {
+    background: #2563eb;
+    color: white;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 12px;
+    width: 100%;
+}
