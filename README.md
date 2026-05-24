@@ -53,22 +53,23 @@ Possible later additions:
 
 ## Project Structure
 
+```text
 schedule-app/
-├── .venv/
+├── .venv/                 # Local Python virtual environment, do not push
 ├── static/
-│ └── style.css
+│   └── style.css          # CSS styling
 ├── templates/
-│ ├── admin.html
-│ ├── dashboard.html
-│ ├── login.html
-│ └── schedule.html
-├── .gitignore
-├── database.py
-├── main.py
-├── models.py
-├── README.md
-├── requirements.txt
-└── schedule_app.db
+│   ├── admin.html         # Admin page
+│   ├── dashboard.html     # Main dashboard page
+│   ├── login.html         # Login page
+│   └── schedule.html      # Schedule page
+├── .gitignore             # Tells Git what files/folders to ignore
+├── database.py            # SQLite connection, table creation, and database functions
+├── main.py                # Flask app routes
+├── models.py              # Python data classes like User, Teacher, Student, Lesson
+├── README.md              # Project notes and explanation
+├── requirements.txt       # Python packages needed for the project
+└── schedule_app.db        # SQLite database file
 
 .venv/ = local Python virtual environment, do not push this
 static/ = CSS, images, JavaScript
