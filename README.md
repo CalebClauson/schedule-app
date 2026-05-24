@@ -55,21 +55,20 @@ Possible later additions:
 
 ```text
 schedule-app/
-├── .venv/                 # Local Python virtual environment, do not push
+├── .venv/
 ├── static/
-│   └── style.css          # CSS styling
+│   └── style.css
 ├── templates/
-│   ├── admin.html         # Admin page
-│   ├── dashboard.html     # Main dashboard page
-│   ├── login.html         # Login page
-│   └── schedule.html      # Schedule page
-├── .gitignore             # Tells Git what files/folders to ignore
-├── database.py            # SQLite connection, table creation, and database functions
-├── main.py                # Flask app routes
-├── models.py              # Python data classes like User, Teacher, Student, Lesson
-├── README.md              # Project notes and explanation
-├── requirements.txt       # Python packages needed for the project
-└── schedule_app.db        # SQLite database file
+│   ├── admin.html
+│   ├── dashboard.html
+│   ├── login.html
+│   └── schedule.html
+├── .gitignore
+├── database.py
+├── main.py
+├── README.md
+├── requirements.txt
+└── schedule_app.db
 
 .venv/ = local Python virtual environment, do not push this
 static/ = CSS, images, JavaScript
@@ -77,7 +76,6 @@ templates/ = HTML pages Flask renders
 .gitignore = tells Git what not to push
 database.py = SQLite connection, table creation, database functions
 main.py = Flask app routes
-models.py = Python data classes like User, Teacher, Student, Lesson
 README.md = project notes/explanation
 requirements.txt = Python packages needed for the project
 schedule_app.db = SQLite database file
