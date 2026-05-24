@@ -53,15 +53,30 @@ Possible later additions:
 
 ## Project Structure
 
-```text
 schedule-app/
+├── .venv/
 ├── static/
-│   └── style.css
+│ └── style.css
 ├── templates/
-│   ├── index.html
-│   ├── teachers.html
-│   └── schedule.html
-├── db.py
+│ ├── admin.html
+│ ├── dashboard.html
+│ ├── login.html
+│ └── schedule.html
+├── .gitignore
+├── database.py
 ├── main.py
-└── README.md
-```
+├── models.py
+├── README.md
+├── requirements.txt
+└── schedule_app.db
+
+.venv/ = local Python virtual environment, do not push this
+static/ = CSS, images, JavaScript
+templates/ = HTML pages Flask renders
+.gitignore = tells Git what not to push
+database.py = SQLite connection, table creation, database functions
+main.py = Flask app routes
+models.py = Python data classes like User, Teacher, Student, Lesson
+README.md = project notes/explanation
+requirements.txt = Python packages needed for the project
+schedule_app.db = SQLite database file
