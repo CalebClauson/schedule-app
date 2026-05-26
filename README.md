@@ -65,6 +65,7 @@ schedule-app/
 │   └── schedule.html
 ├── .gitignore
 ├── database.py
+├── helpers.py
 ├── main.py
 ├── README.md
 ├── requirements.txt
@@ -75,6 +76,7 @@ static/ = CSS, images, JavaScript
 templates/ = HTML pages Flask renders
 .gitignore = tells Git what not to push
 database.py = SQLite connection, table creation, database functions
+helpers.py = helper for in app functions not related to database directly
 main.py = Flask app routes
 README.md = project notes/explanation
 requirements.txt = Python packages needed for the project
