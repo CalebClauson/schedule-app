@@ -17,7 +17,7 @@ def create_db():
 
     # user_id, first_name, last_name, phone, max_students, notes
     create_teachers_table = """CREATE TABLE IF NOT EXISTS
-    teachers(user_id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, phone TEXT, max_students INTEGER DEFAULT 4, notes TEXT, FOREIGN KEY(user_id) REFERENCES users(user_id))"""
+    teachers(user_id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, phone TEXT, max_students INTEGER DEFAULT 10, notes TEXT, FOREIGN KEY(user_id) REFERENCES users(user_id))"""
 
     # student_id, first_name, last_name, parent_first_name, parent_last_name, parent_phone, parent_email, birth_date, is_active, notes
     create_students_table = """CREATE TABLE IF NOT EXISTS
@@ -116,7 +116,7 @@ def get_user_by_username(username):
 
 # create user first | create_user
 # create teacher profile using the user_id returned from create_user
-def create_teacher(user_id, first_name, last_name, phone=None, max_students=4, notes=None):
+def create_teacher(user_id, first_name, last_name, phone=None, max_students=10, notes=None):
     connection, cursor = create_connection()
     try:
         cursor.execute("""INSERT INTO teachers(user_id, first_name, last_name, phone, max_students, notes) VALUES (?, ?, ?, ?, ?, ?)""", (user_id, first_name, last_name, phone, max_students, notes))

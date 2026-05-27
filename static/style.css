@@ -1,15 +1,29 @@
-/*body = main site look*
-/*.page = spacing*
-/*.card = boxes*
-/*.button = buttons/links*
-/*input = login/forms*
-
+/* body = main site look */
+/* h1 = headers */
+/* p = paragraph */
+/* .page = spacing */
+/* .card = boxes */
+/* .button = buttons/links */
+/* input = login/forms */
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111827;
-    color: white;
+    font-family: "Roboto", Arial, sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+h1 {
+    text-align: center;
+    margin: 0 0 20px 0;
+    font-weight: bold;
+    font-size: 30px;
+    color: #60a5fa;
+}
+
+p {
+    margin: 0;
+    color: #e5e7eb;
 }
 
 .page {
@@ -17,25 +31,56 @@ body {
 }
 
 .card {
-    background: #1f2937;
+    background: #1e293b;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 15px;
+    border: 1px solid #334155;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+label {
+    display: block;
+    text-align: center;
+    margin-bottom: 5px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    color: #bfdbfe;
+    font-weight: bold;
+}
+
+input {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 12px;
+    width: 50%;
+    max-width: 300px;
+    padding: 10px;
+    font-family: "Roboto", Arial, sans-serif;
+    color: #e5e7eb;
+    background-color: lightskyblue;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
 }
 
 button,
 .button {
-    background: #2563eb;
-    color: white;
-    padding: 10px 14px;
+    font-family: "Roboto", Arial, sans-serif;
+    display: block;
+    margin: 15px auto;
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
-    text-decoration: none;
+    background-color: #2563eb;
+    color: white;
     cursor: pointer;
 }
 
-input {
-    padding: 10px;
-    margin-bottom: 12px;
-    width: 100%;
+button:hover,
+.button:hover {
+    background-color: #1d4ed8;
 }

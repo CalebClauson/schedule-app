@@ -1,11 +1,33 @@
 {% extends 'base_template.html' %}
 
-<!-- block head -->
-{% block head %}
-
-{% endblock %}
+<!-- title -->
+{% block title %}Dashboard{% endblock %}
 
 <!-- block body -->
 {% block body %}
-<h1>Dashboard<h1></h1>
+<div class="page">
+
+    <div class="card">
+        <form>
+            <h1>Welcome! {{ user_name }} </h1>
+            <h1>Today's Schedule:</h1>
+            <button>Full Schedule:</button>
+            {% for lesson in lessons %}
+            <tr>
+                <td>{{ lesson[1] }}</td>
+                <td>{{ lesson[2] }}</td>
+                <td>{{ lesson[3] }}</td>
+                <td>{{ lesson[4] }}</td>
+                <td>{{ lesson[5] }}</td>
+                <td>{{ lesson[6] }}</td>
+                <td>{{ lesson[7] }}</td>
+                <td>{{ lesson[8] }}</td>
+                <td>{{ lesson[9] }}</td>
+                <td>{{ lesson[10] }}</td>
+            </tr>
+            {% endfor %}
+        </form>
+    </div>
+
+</div>
 {% endblock %}
