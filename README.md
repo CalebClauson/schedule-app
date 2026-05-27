@@ -1,6 +1,6 @@
 # Schedule App
 
-Non-Functional Currently, WIP. Building file structure
+Work in progress. The project currently has the main Flask file structure, SQLite database setup, student/teacher/lesson database functions, basic template structure, initial CSS styling, and password hashing dependency setup.
 
 ## Project Idea
 
@@ -28,6 +28,28 @@ Create a simple client/server scheduling system where:
 - Teachers only need a web browser to use it
 - The app stores schedule data in a database instead of relying directly on a spreadsheet
 
+## Current Progress
+
+Current features and structure include:
+
+- Flask app setup
+- SQLite database setup
+- Users table
+- Teachers table
+- Students table
+- Lessons table
+- Student create, edit, search, soft delete, and hard delete functions
+- Teacher create, edit, search, and active-user filtering
+- Lesson creation function
+- Lesson booking validation
+- Schedule conflict checking
+- Buffer time between lessons
+- Basic HTML template structure
+- Base template setup
+- Initial dashboard page
+- Initial CSS styling
+- Argon2 password hashing dependency installed for future login work
+
 ## Google Sheet Note
 
 This project is inspired by a real scheduling system that currently uses Google Sheets. However, the first version of this app will not directly import from the Google Sheet.
@@ -43,11 +65,11 @@ Instead, this app will focus on creating a cleaner scheduling system from the gr
 - SQLite
 - HTML
 - CSS
+- Argon2 password hashing through `argon2-cffi`
 
 Possible later additions:
 
 - JavaScript
-- User login system
 - Hosted database
 - Google Sheets importing if the format becomes consistent enough
 
@@ -55,29 +77,17 @@ Possible later additions:
 
 ```text
 schedule-app/
-├── .venv/
 ├── static/
 │   └── style.css
 ├── templates/
+│   ├── base_template.html
 │   ├── admin.html
 │   ├── dashboard.html
 │   ├── login.html
 │   └── schedule.html
 ├── .gitignore
+├── app.py
 ├── database.py
 ├── helpers.py
-├── app.py
 ├── README.md
-├── requirements.txt
-└── schedule_app.db
-
-.venv/ = local Python virtual environment, do not push this
-static/ = CSS, images, JavaScript
-templates/ = HTML pages Flask renders
-.gitignore = tells Git what not to push
-database.py = SQLite connection, table creation, database functions
-helpers.py = helper for in app functions not related to database directly
-app.py = Flask app routes
-README.md = project notes/explanation
-requirements.txt = Python packages needed for the project
-schedule_app.db = SQLite database file
+└── requirements.txt

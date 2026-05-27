@@ -8,25 +8,34 @@
 <div class="page">
 
     <div class="card">
-        <form>
-            <h1>Welcome! {{ user_name }} </h1>
-            <h1>Today's Schedule:</h1>
-            <button>Full Schedule:</button>
-            {% for lesson in lessons %}
-            <tr>
-                <td>{{ lesson[1] }}</td>
-                <td>{{ lesson[2] }}</td>
-                <td>{{ lesson[3] }}</td>
-                <td>{{ lesson[4] }}</td>
-                <td>{{ lesson[5] }}</td>
-                <td>{{ lesson[6] }}</td>
-                <td>{{ lesson[7] }}</td>
-                <td>{{ lesson[8] }}</td>
-                <td>{{ lesson[9] }}</td>
-                <td>{{ lesson[10] }}</td>
-            </tr>
-            {% endfor %}
-        </form>
+        <h1>Welcome, {{ username }}</h1>
+        <p class="dashboard-subtitle">Here is <strong>Today's Schedule</strong>.</p>
+    </div>
+
+    <div class="schedule-card">
+        <h2>Today's Schedule</h2>
+
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Lesson</th>
+                    <th>Student</th>
+                    <th>Age</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for time in time_slots %}
+                <tr>
+                    <td class="time-column">{{ time }}</td>
+                    <td class="lesson-column">
+                        Available
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 </div>
