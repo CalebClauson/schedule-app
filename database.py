@@ -1,4 +1,5 @@
 import sqlite3
+from helpers import add_minutes
 
 # ============================
 # TABLE CREATION (ONE TIME USE)
@@ -18,14 +19,21 @@ def create_db():
     create_teachers_table = """CREATE TABLE IF NOT EXISTS
     teachers(user_id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, phone TEXT, max_students INTEGER DEFAULT 4, notes TEXT, FOREIGN KEY(user_id) REFERENCES users(user_id))"""
 
-    # student_id, first_name, last_name, phone, parent_first_name, parent_last_name, parent_phone, birth_date, notes
+    # student_id, first_name, last_name, parent_first_name, parent_last_name, parent_phone, parent_email, birth_date, is_active, notes
     create_students_table = """CREATE TABLE IF NOT EXISTS
-    students(student_id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT, parent_first_name TEXT, parent_last_name TEXT, parent_phone TEXT, birth_date TEXT NOT NULL, is_active INTEGER DEFAULT 1, notes TEXT)"""
+    students(student_id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT, parent_first_name TEXT, parent_last_name TEXT, parent_phone TEXT, parent_email TEXT, birth_date TEXT NOT NULL, is_active INTEGER DEFAULT 1, notes TEXT)"""
 
     # lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes, recurring_id, created_at, updated_at
     #recurring id for potential lessons that happen weekly; implementation unknown but there for the future
     create_lesson_table = """CREATE TABLE IF NOT EXISTS
-    lessons(lesson_id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER NOT NULL, student_id INTEGER NOT NULL, lesson_date text NOT NULL, start_time TEXT NOT NULL, end_time TEXT NOT NULL, status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled','completed','canceled')), location TEXT DEFAULT 'Teaching Center', notes TEXT, recurring_id INTEGER, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT, FOREIGN KEY(teacher_id) REFERENCES teachers(user_id) ON DELETE CASCADE, FOREIGN KEY(student_id) REFERENCES students(student_id) ON DELETE CASCADE)"""
+    lessons(lesson_id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER NOT NULL, student_id INTEGER NOT NULL, lesson_date TEXT NOT NULL, start_time TEXT NOT NULL, end_time TEXT NOT NULL, status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled','completed','canceled')), location TEXT DEFAULT 'Teaching Center', notes TEXT, recurring_id INTEGER, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT, FOREIGN KEY(teacher_id) REFERENCES teachers(user_id) ON DELETE CASCADE, FOREIGN KEY(student_id) REFERENCES students(student_id) ON DELETE CASCADE)"""
+    
+    cursor.execute(create_users_table)
+    cursor.execute(create_teachers_table)
+    cursor.execute(create_students_table)
+    cursor.execute(create_lesson_table)
+    connection.commit()
+    connection.close()
 
 # ============================
 # CONNECTION - connection, cursor = create_connection()
@@ -44,11 +52,17 @@ def create_connection():
 
 def create_user(username, password_hash, email, role='teacher', is_active=1):
     connection, cursor = create_connection()
-    cursor.execute("""INSERT INTO users(username, password_hash, email, role, is_active) VALUES (?, ?, ?, ?, ?)""", (username, password_hash, email, role, is_active))
-    user_id = cursor.lastrowid
-    connection.commit()
-    connection.close()
-    return user_id
+    try:
+        cursor.execute("""INSERT INTO users(username, password_hash, email, role, is_active) VALUES (?, ?, ?, ?, ?)""", (username, password_hash, email, role, is_active))
+        user_id = cursor.lastrowid
+        connection.commit()
+        return user_id
+    except sqlite3.IntegrityError as e:
+        connection.rollback()
+        print("Error creating user:", e)
+        return None
+    finally:
+        connection.close()
 
 #soft deletion
 def deactivate_user(user_id):
@@ -127,6 +141,13 @@ def edit_teacher(user_id, first_name, last_name, phone, max_students, notes):
     #returns True or False | use later to tell if anything was changed
     return updated > 0
 
+def get_all_teachers():
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT teachers.user_id, teachers.first_name, teachers.last_name, teachers.phone, teachers.max_students, teachers.notes FROM teachers JOIN users ON teachers.user_id = users.user_id WHERE users.is_active = 1""")
+    teachers = cursor.fetchall()
+    connection.close()
+    return teachers
+
 def get_teacher_by_id(user_id):
     connection, cursor = create_connection()
     cursor.execute("""SELECT teachers.user_id, teachers.first_name, teachers.last_name, teachers.phone, teachers.max_students, teachers.notes FROM teachers JOIN users ON teachers.user_id = users.user_id WHERE teachers.user_id = ? AND users.is_active = 1""", (user_id,))
@@ -156,11 +177,17 @@ def get_teacher_by_name(first_name=None, last_name=None):
 
 def create_student(first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes=None):
     connection, cursor = create_connection()
-    cursor.execute("""INSERT INTO students(first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", (first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes))
-    student_id = cursor.lastrowid
-    connection.commit()
-    connection.close()
-    return student_id
+    try:
+        cursor.execute("""INSERT INTO students(first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", (first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes))
+        student_id = cursor.lastrowid
+        connection.commit()
+        return student_id
+    except sqlite3.IntegrityError as e:
+        connection.rollback()
+        print("Error creating student:", e)
+        return None
+    finally:
+        connection.close()
 
 #soft deletion
 def deactivate_student(student_id):
@@ -192,6 +219,13 @@ def edit_student(student_id, first_name, last_name, parent_first_name, parent_la
     connection.close()
     #returns True or False | use later to tell if anything was changed
     return updated > 0
+
+def get_all_students():
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT student_id, first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes FROM students WHERE is_active = 1""")
+    students = cursor.fetchall()
+    connection.close()
+    return students
     
 def get_student_by_id(student_id):
     connection, cursor = create_connection()
@@ -221,6 +255,8 @@ def get_student_by_name(first_name=None,last_name=None):
 
 def can_book_lesson(teacher_id, lesson_date, start_time, end_time):
     connection, cursor = create_connection()
+    # buffer time in minutes between lessons
+    buffer_minutes = 20
     # check if teacher exists and is active, then get max_students
     cursor.execute("""SELECT teachers.max_students FROM teachers JOIN users ON teachers.user_id = users.user_id WHERE teachers.user_id = ? AND users.is_active = 1""", (teacher_id,))
     result = cursor.fetchone()
@@ -228,8 +264,10 @@ def can_book_lesson(teacher_id, lesson_date, start_time, end_time):
         connection.close()
         return False
     max_students = result[0]
-    # check if teacher already has a lesson overlapping this time
-    cursor.execute("""SELECT COUNT(*) FROM lessons WHERE teacher_id = ? AND lesson_date = ? AND start_time < ? AND end_time > ?""", (teacher_id, lesson_date, end_time, start_time))
+    # check if teacher already has a lesson overlapping this time | including a buffer time
+    buffered_start_time = add_minutes(start_time, -buffer_minutes)
+    buffered_end_time = add_minutes(end_time, buffer_minutes)
+    cursor.execute("""SELECT COUNT(*) FROM lessons WHERE teacher_id = ? AND lesson_date = ? AND start_time < ? AND end_time > ?""", (teacher_id, lesson_date, buffered_end_time, buffered_start_time))
     overlapping_lessons = cursor.fetchone()[0]
     if overlapping_lessons > 0:
         connection.close()
@@ -242,12 +280,22 @@ def can_book_lesson(teacher_id, lesson_date, start_time, end_time):
         return False
     return True
 
-def create_lesson(teacher_id, student_id, lesson_date, start_time, end_time, status, notes=None):
+def create_lesson(teacher_id, student_id, lesson_date, start_time, end_time, status="scheduled", location="Teaching Center", notes=None):
     if not can_book_lesson(teacher_id, lesson_date, start_time, end_time):
         print("Teacher is already booked or at max lessons for the day.")
         return None
-    #finish lesson creation
-    return
+    connection, cursor = create_connection()
+    try:
+        cursor.execute("""INSERT INTO lessons (teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", (teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes))
+        lesson_id = cursor.lastrowid
+        connection.commit()
+        return lesson_id
+    except sqlite3.IntegrityError as e:
+        connection.rollback()
+        print("Error creating lesson:", e)
+        return None
+    finally:
+        connection.close()
 
 def delete_lesson(lesson_id):
     return
