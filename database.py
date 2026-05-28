@@ -253,7 +253,7 @@ def get_student_by_name(first_name=None,last_name=None):
 # LESSONS TABLE
 # ============================
 
-def can_book_lesson(teacher_id, lesson_date, start_time, end_time):
+def can_book_lesson(teacher_id, lesson_date, start_time, end_time, exclude_lesson_id=None):
     connection, cursor = create_connection()
     # buffer time in minutes between lessons
     buffer_minutes = 20
@@ -267,7 +267,10 @@ def can_book_lesson(teacher_id, lesson_date, start_time, end_time):
     # check if teacher already has a lesson overlapping this time | including a buffer time
     buffered_start_time = add_minutes(start_time, -buffer_minutes)
     buffered_end_time = add_minutes(end_time, buffer_minutes)
-    cursor.execute("""SELECT COUNT(*) FROM lessons WHERE teacher_id = ? AND lesson_date = ? AND start_time < ? AND end_time > ?""", (teacher_id, lesson_date, buffered_end_time, buffered_start_time))
+    if exclude_lesson_id is None:
+        cursor.execute("""SELECT COUNT(*) FROM lessons WHERE teacher_id = ? AND lesson_date = ? AND start_time < ? AND end_time > ?""", (teacher_id, lesson_date, buffered_end_time, buffered_start_time))
+    else:
+        cursor.execute("""SELECT COUNT(*) FROM lessons WHERE teacher_id = ? AND lesson_date = ? AND start_time < ? AND end_time > ? AND lesson_id != ?""", (teacher_id, lesson_date, buffered_end_time, buffered_start_time, exclude_lesson_id))
     overlapping_lessons = cursor.fetchone()[0]
     if overlapping_lessons > 0:
         connection.close()
@@ -298,31 +301,112 @@ def create_lesson(teacher_id, student_id, lesson_date, start_time, end_time, sta
         connection.close()
 
 def delete_lesson(lesson_id):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""DELETE FROM lessons WHERE lesson_id = ?""", (lesson_id,))
+    #tells if row was affected | if any at all for debug purpose/QOL
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    #returns True or False | use later to tell if anything was changed
+    return updated > 0
+        
 
-def edit_lesson(teacher_id, student_id, lesson_date, start_time, end_time, status, notes):
-    return
+def edit_lesson(lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, notes):
+    if not can_book_lesson(teacher_id, lesson_date, start_time, end_time, exclude_lesson_id=lesson_id):
+        print("Teacher is already booked or at max lessons for the day.")
+        return False
+    connection, cursor = create_connection()
+    cursor.execute("""UPDATE lessons SET teacher_id = ?, student_id = ?, lesson_date = ?, start_time = ?, end_time = ?, status = ?, notes = ? WHERE lesson_id = ?""", (teacher_id, student_id, lesson_date, start_time, end_time, status, notes, lesson_id))
+    #tells if row was affected | if any at all for debug purpose/QOL
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    #returns True or False | use later to tell if anything was changed
+    return updated > 0
 
 def get_lesson_by_id(lesson_id):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes FROM lessons WHERE lesson_id = ?""", (lesson_id,))
+    lesson = cursor.fetchone()
+    connection.close()
+    return lesson
 
 def get_lesson_by_teacher(teacher_id):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes FROM lessons WHERE teacher_id = ?""", (teacher_id,))
+    lessons = cursor.fetchall()
+    connection.close()
+    return lessons
 
 def get_lesson_by_student(student_id):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes FROM lessons WHERE student_id = ?""", (student_id,))
+    lessons = cursor.fetchall()
+    connection.close()
+    return lessons
 
 def update_lesson_status(lesson_id, status):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""UPDATE lessons SET status = ? WHERE lesson_id = ?""", (status, lesson_id))
+    #tells if row was affected | if any at all for debug purpose/QOL
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    #returns True or False | use later to tell if anything was changed
+    return updated > 0
 
 def update_lesson_notes(lesson_id, notes):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""UPDATE lessons SET notes = ? WHERE lesson_id = ?""", (notes, lesson_id))
+    #tells if row was affected | if any at all for debug purpose/QOL
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    #returns True or False | use later to tell if anything was changed
+    return updated > 0
 
 def update_lesson_time(lesson_id, start_time, end_time):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT teacher_id, lesson_date FROM lessons WHERE lesson_id = ?""", (lesson_id,))
+    lesson = cursor.fetchone()
+    if lesson is None:
+        connection.close()
+        return False 
+    teacher_id, lesson_date = lesson
+    if not can_book_lesson(teacher_id, lesson_date, start_time, end_time, exclude_lesson_id=lesson_id):
+        connection.close()
+        print("Teacher is already booked or at max lessons for the day.")
+        return False
+    cursor.execute("""UPDATE lessons SET start_time = ?, end_time = ? WHERE lesson_id = ?""", (start_time, end_time, lesson_id))
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    return updated > 0
 
 def update_lesson_teacher(lesson_id, teacher_id):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT lesson_date, start_time, end_time FROM lessons WHERE lesson_id = ?""", (lesson_id,))
+    lesson = cursor.fetchone()
+    if lesson is None:
+        connection.close()
+        return False
+    lesson_date, start_time, end_time = lesson
+    if not can_book_lesson(teacher_id, lesson_date, start_time, end_time, exclude_lesson_id=lesson_id):
+        connection.close()
+        print("Teacher is already booked or at max lessons for the day.")
+        return False
+    cursor.execute("""UPDATE lessons SET teacher_id = ? WHERE lesson_id = ?""", (teacher_id, lesson_id))
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    return updated > 0
 
 def update_lesson_student(lesson_id, student_id):
-    return
+    connection, cursor = create_connection()
+    cursor.execute("""UPDATE lessons SET student_id = ? WHERE lesson_id = ?""", (student_id, lesson_id))
+    #tells if row was affected | if any at all for debug purpose/QOL
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    #returns True or False | use later to tell if anything was changed
+    return updated > 0
