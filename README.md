@@ -4,7 +4,7 @@ Work in progress. The project currently has the main Flask file structure, SQLit
 
 ## Project Idea
 
-This project is a web-based scheduling app inspired by my girlfriend’s job. Her company manages teacher schedules through a Google Sheet. The sheet includes different teachers, time slots, students, and locations. Some teachers work at a center, while others travel to teach at a parent’s house.
+This project is a web-based scheduling app inspired by my fiance’s job. Her company manages teacher schedules through a Google Sheet. The sheet includes different teachers, time slots, students, and locations. Some teachers work at a center, while others travel to teach at a parent’s house.
 
 I decided to use that situation as the idea for this project because it is a real scheduling problem that could be improved with a cleaner system.
 
@@ -12,7 +12,7 @@ The goal is to create a schedule app where teachers can view their schedules fro
 
 ## Why I Decided to Make This
 
-I wanted to make a project that solves a real problem instead of building something random. My girlfriend’s job gave me a good example of a system that works, but could probably be easier to use.
+I wanted to make a project that solves a real problem instead of building something random. My fiance’s job gave me a good example of a system that works, but could probably be easier to use.
 
 Using a Google Sheet is simple, but it can become messy when there are a lot of teachers, students, schedule changes, and different teaching locations. Since some lessons happen at a center and others happen at parent homes, it would be useful to have a system that can organize schedules clearly and eventually check for conflicts.
 
