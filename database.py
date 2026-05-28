@@ -331,14 +331,14 @@ def get_lesson_by_id(lesson_id):
     connection.close()
     return lesson
 
-def get_lesson_by_teacher(teacher_id):
+def get_lessons_by_teacher(teacher_id):
     connection, cursor = create_connection()
     cursor.execute("""SELECT lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes FROM lessons WHERE teacher_id = ?""", (teacher_id,))
     lessons = cursor.fetchall()
     connection.close()
     return lessons
 
-def get_lesson_by_student(student_id):
+def get_lessons_by_student(student_id):
     connection, cursor = create_connection()
     cursor.execute("""SELECT lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, location, notes FROM lessons WHERE student_id = ?""", (student_id,))
     lessons = cursor.fetchall()
@@ -378,9 +378,11 @@ def update_lesson_time(lesson_id, start_time, end_time):
         print("Teacher is already booked or at max lessons for the day.")
         return False
     cursor.execute("""UPDATE lessons SET start_time = ?, end_time = ? WHERE lesson_id = ?""", (start_time, end_time, lesson_id))
+    #tells if row was affected | if any at all for debug purpose/QOL
     updated = cursor.rowcount
     connection.commit()
     connection.close()
+    #returns True or False | use later to tell if anything was changed
     return updated > 0
 
 def update_lesson_teacher(lesson_id, teacher_id):
@@ -396,9 +398,11 @@ def update_lesson_teacher(lesson_id, teacher_id):
         print("Teacher is already booked or at max lessons for the day.")
         return False
     cursor.execute("""UPDATE lessons SET teacher_id = ? WHERE lesson_id = ?""", (teacher_id, lesson_id))
+    #tells if row was affected | if any at all for debug purpose/QOL
     updated = cursor.rowcount
     connection.commit()
     connection.close()
+    #returns True or False | use later to tell if anything was changed
     return updated > 0
 
 def update_lesson_student(lesson_id, student_id):
