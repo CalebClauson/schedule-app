@@ -1,6 +1,7 @@
 # Schedule App
 
-Work in progress. The project currently has the main Flask file structure, SQLite database setup, student/teacher/lesson database functions, basic template structure, initial CSS styling, and password hashing dependency setup.
+This project is still under active development.
+The database helper layer is mostly completed, but it has not been fully activated or tested through the Flask app yet.
 
 ## Project Idea
 
@@ -33,17 +34,18 @@ Create a simple client/server scheduling system where:
 Current features and structure include:
 
 - Flask app setup
-- SQLite database setup
+- SQLite database schema setup
 - Users table
 - Teachers table
 - Students table
 - Lessons table
 - Student create, edit, search, soft delete, and hard delete functions
 - Teacher create, edit, search, and active-user filtering
-- Lesson creation function
+- Lesson create, edit, delete, lookup, and update functions
 - Lesson booking validation
 - Schedule conflict checking
 - Buffer time between lessons
+- Conflict checks for lesson edits, time changes, and teacher reassignment
 - Basic HTML template structure
 - Base template setup
 - Initial dashboard page
