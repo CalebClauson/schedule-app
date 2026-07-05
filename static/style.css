@@ -29,6 +29,21 @@ body {
     margin: 0 auto 15px auto;
 }
 
+.schedule-card h2 {
+    color: #60a5fa;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.schedule-card p {
+    margin-bottom: 8px;
+    color: #e5e7eb;
+}
+
+.schedule-card strong {
+    color: #bfdbfe;
+}
+
 /* Text */
 h1 {
     text-align: center;

@@ -1,9 +1,36 @@
 {% extends 'base_template.html' %}
 
-<!-- title -->
-{% block title %}Lesson Details{% endblock %}
+{% block content %}
+<div class="page">
+    <h1>Lesson Detail</h1>
 
-<!-- block body -->
-{% block body %}
-<h1>Lesson Details<h1></h1>
+    <div class="schedule-card">
+        <h2>Lesson Information</h2>
+
+        <p><strong>Date:</strong> {{ lesson[1] }}</p>
+        <p><strong>Time:</strong> {{ lesson[2] }} - {{ lesson[3] }}</p>
+        <p><strong>Status:</strong> {{ lesson[4] }}</p>
+        <p><strong>Location:</strong> {{ lesson[5] }}</p>
+
+        <br>
+
+        <h2>Student Information</h2>
+
+        <p><strong>Name:</strong> {{ lesson[6] }} {{ lesson[7] }}</p>
+        <p><strong>Email:</strong> {{ lesson[8] }}</p>
+        <p><strong>Phone:</strong> {{ lesson[9] }}</p>
+
+        <br>
+
+        <h2>Lesson Notes</h2>
+        <p>{{ lesson[10] }}</p>
+
+        <br>
+
+        <h2>Student Notes</h2>
+        <p>{{ lesson[11] }}</p>
+
+        <a class="button" href="/schedule">Back to Schedule</a>
+    </div>
+</div>
 {% endblock %}

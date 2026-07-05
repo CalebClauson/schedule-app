@@ -1,25 +1,27 @@
-{% extends 'base_template.html' %}
+{% extends "base_template.html" %}
 
-<!-- title -->
 {% block title %}Login{% endblock %}
 
-<!-- block body -->
 {% block body %}
 <div class="page">
+    <h1>Login</h1>
 
     <div class="card">
-        <h1>Welcome!</h1>
+        {% if error %}
+            <p style="color: #f87171; text-align: center; margin-bottom: 12px;">
+                {{ error }}
+            </p>
+        {% endif %}
 
-        <form>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
+        <form method="POST" action="{{ url_for('login') }}">
+            <label>Username</label>
+            <input type="text" name="username" required>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
+            <label>Password</label>
+            <input type="password" name="password" required>
 
             <button type="submit">Login</button>
         </form>
     </div>
-
 </div>
 {% endblock %}

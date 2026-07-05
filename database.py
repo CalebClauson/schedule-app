@@ -5,6 +5,7 @@ from helpers import add_minutes
 # TABLE CREATION (ONE TIME USE)
 # ============================
 
+#created db alread | do not recreate unless you want to lose data
 def create_db():
     connection = sqlite3.connect("schedule_app.db")
     connection.execute("PRAGMA foreign_keys = ON")  # enable FK constraints
@@ -27,7 +28,7 @@ def create_db():
     #recurring id for potential lessons that happen weekly; implementation unknown but there for the future
     create_lesson_table = """CREATE TABLE IF NOT EXISTS
     lessons(lesson_id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER NOT NULL, student_id INTEGER NOT NULL, lesson_date TEXT NOT NULL, start_time TEXT NOT NULL, end_time TEXT NOT NULL, status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled','completed','canceled')), location TEXT DEFAULT 'Teaching Center', notes TEXT, recurring_id INTEGER, created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT, FOREIGN KEY(teacher_id) REFERENCES teachers(user_id) ON DELETE CASCADE, FOREIGN KEY(student_id) REFERENCES students(student_id) ON DELETE CASCADE)"""
-    
+
     cursor.execute(create_users_table)
     cursor.execute(create_teachers_table)
     cursor.execute(create_students_table)
@@ -84,7 +85,7 @@ def delete_user(user_id):
     connection.close()
     #returns True or False | use later to tell if anything was changed
     return updated > 0
-    
+
 def edit_user(user_id, username, password_hash, email, role, is_active):
     connection, cursor = create_connection()
     cursor.execute("""UPDATE users SET username=?, password_hash=?, email=?, role=?, is_active=? WHERE user_id = ?""", (username, password_hash, email, role, is_active, user_id))
@@ -108,6 +109,19 @@ def get_user_by_username(username):
     user = cursor.fetchone()
     connection.close()
     return user
+
+def return_all_users():
+    connection, cursor = create_connection()
+    cursor.execute("""SELECT user_id, username, email, role, is_active FROM users""")
+    users = cursor.fetchall()
+    for user in users:
+        print(f"ID: {user[0]}")
+        print(f"Username: {user[1]}")
+        print(f"Email: {user[2]}")
+        print(f"Role: {user[3]}")
+        print(f"Active: {user[4]}")
+        print("-" * 30)
+    connection.close()
 
 
 # ============================
@@ -226,7 +240,7 @@ def get_all_students():
     students = cursor.fetchall()
     connection.close()
     return students
-    
+
 def get_student_by_id(student_id):
     connection, cursor = create_connection()
     cursor.execute("""SELECT student_id, first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes FROM students WHERE student_id = ? AND is_active = 1""",(student_id,))
@@ -309,7 +323,7 @@ def delete_lesson(lesson_id):
     connection.close()
     #returns True or False | use later to tell if anything was changed
     return updated > 0
-        
+
 
 def edit_lesson(lesson_id, teacher_id, student_id, lesson_date, start_time, end_time, status, notes):
     if not can_book_lesson(teacher_id, lesson_date, start_time, end_time, exclude_lesson_id=lesson_id):
@@ -371,7 +385,7 @@ def update_lesson_time(lesson_id, start_time, end_time):
     lesson = cursor.fetchone()
     if lesson is None:
         connection.close()
-        return False 
+        return False
     teacher_id, lesson_date = lesson
     if not can_book_lesson(teacher_id, lesson_date, start_time, end_time, exclude_lesson_id=lesson_id):
         connection.close()
