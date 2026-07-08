@@ -1,7 +1,7 @@
 # Schedule App
 
 This project is still under active development.
-The database helper layer is mostly completed, but it has not been fully activated or tested through the Flask app yet.
+The database helper layer is mostly built, and the Flask app now has a working login flow, protected routes, a dashboard schedule view, lesson detail pages, and editable lesson/student notes.
 
 ## Project Idea
 
@@ -17,14 +17,18 @@ I wanted to make a project that solves a real problem instead of building someth
 
 Using a Google Sheet is simple, but it can become messy when there are a lot of teachers, students, schedule changes, and different teaching locations. Since some lessons happen at a center and others happen at parent homes, it would be useful to have a system that can organize schedules clearly and eventually check for conflicts.
 
-This project gives me a chance to practice building a real client/server style application with Python, Flask, SQLite, HTML, and CSS while making something that is based on an actual workplace situation.
+This project gives me a chance to practice building a real client/server style application with Python, Flask, SQLite, HTML, CSS, and JavaScript while making something that is based on an actual workplace situation.
 
 ## Main Goal
 
 Create a simple client/server scheduling system where:
 
+- Teachers can log in
 - Teachers can view their own schedules
-- Admins can view and manage all schedules
+- Teachers can open lesson detail pages
+- Teachers can update lesson notes
+- Teachers can update student notes
+- Admins can eventually view and manage all schedules
 - Schedule data is stored in a database
 - Teachers only need a web browser to use it
 - The app stores schedule data in a database instead of relying directly on a spreadsheet
@@ -39,6 +43,8 @@ Current features and structure include:
 - Teachers table
 - Students table
 - Lessons table
+- Database connection helper
+- User create, edit, deactivate, delete, and lookup functions
 - Student create, edit, search, soft delete, and hard delete functions
 - Teacher create, edit, search, and active-user filtering
 - Lesson create, edit, delete, lookup, and update functions
@@ -46,34 +52,33 @@ Current features and structure include:
 - Schedule conflict checking
 - Buffer time between lessons
 - Conflict checks for lesson edits, time changes, and teacher reassignment
+- Dummy seed data for testing
+- Login page
+- Basic session-based login flow
+- Protected dashboard, schedule, lesson detail, and admin routes
+- Dashboard schedule view filtered by logged-in teacher
+- Today’s schedule display
+- Live JavaScript clock on the dashboard
+- Lesson detail page
+- Lesson information display
+- Student information display
+- Editable lesson notes
+- Editable student notes
 - Basic HTML template structure
 - Base template setup
-- Initial dashboard page
 - Initial CSS styling
 - Argon2 password hashing dependency installed for future login work
 
-## Google Sheet Note
+## Current Login Note
 
-This project is inspired by a real scheduling system that currently uses Google Sheets. However, the first version of this app will not directly import from the Google Sheet.
+The app currently uses plain text passwords for early development testing.
 
-Because the schedules are manually created, the sheet format may not always be consistent. Building a reliable importer would require extra cleanup rules and could become a separate project by itself.
+Example test accounts:
 
-Instead, this app will focus on creating a cleaner scheduling system from the ground up using a database. Schedule entries can be added directly into the app, and Google Sheets importing may be considered later as an optional feature.
-
-## Tech Stack
-
-- Python
-- Flask
-- SQLite
-- HTML
-- CSS
-- Argon2 password hashing through `argon2-cffi`
-
-Possible later additions:
-
-- JavaScript
-- Hosted database
-- Google Sheets importing if the format becomes consistent enough
+```text
+admin / test123
+teacher1 / test123
+teacher2 / test123
 
 ## Project Structure
 
