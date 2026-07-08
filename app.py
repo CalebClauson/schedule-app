@@ -1,5 +1,6 @@
 from venv import create
 
+from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, session
 from database import create_connection, update_lesson_notes, edit_student_notes
 import sqlite3
@@ -51,13 +52,16 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    today = date.today().isoformat()
+    display_today = date.today().strftime("%B %d, %Y")
+
     connection, cursor = create_connection()
 
     cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, students.first_name, students.last_name, lessons.status, lessons.location, lessons.notes FROM lessons JOIN students ON lessons.student_id = students.student_id WHERE lessons.teacher_id = ? ORDER BY lessons.lesson_date, lessons.start_time", (session["user_id"],))
     lessons = cursor.fetchall()
     connection.close()
 
-    return render_template("dashboard.html", username=session["username"], lessons=lessons)
+    return render_template("dashboard.html", username=session["username"], lessons=lessons, today=display_today)
 
 
 # Lesson detail page

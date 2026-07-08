@@ -9,7 +9,14 @@
 
     <div class="card">
         <h1>Welcome, {{ username }}</h1>
-        <p class="dashboard-subtitle">Here is <strong>Today's Schedule</strong>.</p>
+    
+        <p class="dashboard-subtitle">
+            Here is <strong>Today's Schedule</strong> for {{ today }}.
+        </p>
+    
+        <p class="dashboard-time">
+            Current time: <span id="current-time">{{ current_time }}</span>
+        </p>
     </div>
 
     <div class="schedule-card">
@@ -62,6 +69,20 @@
             <p>No lessons scheduled for today.</p>
         {% endif %}
     </div>
-
+    <script>
+        function updateClock() {
+            const now = new Date();
+    
+            const time = now.toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+            });
+    
+            document.getElementById("current-time").textContent = time;
+        }
+    
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
 </div>
 {% endblock %}
