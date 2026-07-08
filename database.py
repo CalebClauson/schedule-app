@@ -234,6 +234,17 @@ def edit_student(student_id, first_name, last_name, parent_first_name, parent_la
     #returns True or False | use later to tell if anything was changed
     return updated > 0
 
+def edit_student_notes(student_id, notes):
+    connection, cursor = create_connection()
+
+    cursor.execute("UPDATE students SET notes = ? WHERE student_id = ? AND is_active = 1", (notes, student_id))
+
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+
+    return updated > 0
+
 def get_all_students():
     connection, cursor = create_connection()
     cursor.execute("""SELECT student_id, first_name, last_name, parent_first_name, parent_last_name, parent_email, birth_date, parent_phone, notes FROM students WHERE is_active = 1""")
@@ -428,3 +439,208 @@ def update_lesson_student(lesson_id, student_id):
     connection.close()
     #returns True or False | use later to tell if anything was changed
     return updated > 0
+
+# ============================
+# DUMMY TEST DATA
+# ============================
+
+def seed_dummy_data():
+    """
+    Adds test users, teachers, students, and lessons.
+    Use this for development/testing only.
+    """
+
+    # Create teacher users first
+    teacher1_user_id = create_user(
+        username="admin",
+        password_hash="test123",
+        email="admin@email.com",
+        role="admin"
+    )
+
+    teacher2_user_id = create_user(
+        username="teacher1",
+        password_hash="test123",
+        email="teacher1@email.com",
+        role="teacher"
+    )
+
+    teacher3_user_id = create_user(
+        username="teacher2",
+        password_hash="test123",
+        email="teacher2@email.com",
+        role="teacher"
+    )
+
+    # Create teacher profiles only if users were created successfully
+    if teacher1_user_id:
+        create_teacher(
+            user_id=teacher1_user_id,
+            first_name="Caleb",
+            last_name="Admin",
+            phone="555-100-0001",
+            max_students=10,
+            notes="Main admin account for testing."
+        )
+
+    if teacher2_user_id:
+        create_teacher(
+            user_id=teacher2_user_id,
+            first_name="Megan",
+            last_name="Lee",
+            phone="555-100-0002",
+            max_students=6,
+            notes="Morning availability."
+        )
+
+    if teacher3_user_id:
+        create_teacher(
+            user_id=teacher3_user_id,
+            first_name="Jordan",
+            last_name="Smith",
+            phone="555-100-0003",
+            max_students=5,
+            notes="Afternoon availability."
+        )
+
+    # Create students
+    student1_id = create_student(
+        first_name="Liam",
+        last_name="Johnson",
+        parent_first_name="Sarah",
+        parent_last_name="Johnson",
+        parent_email="sarah.johnson@email.com",
+        birth_date="2016-04-12",
+        parent_phone="555-200-0001",
+        notes="Needs extra help with reading confidence."
+    )
+
+    student2_id = create_student(
+        first_name="Emma",
+        last_name="Williams",
+        parent_first_name="David",
+        parent_last_name="Williams",
+        parent_email="david.williams@email.com",
+        birth_date="2015-09-03",
+        parent_phone="555-200-0002",
+        notes="Strong in math, struggles with focus."
+    )
+
+    student3_id = create_student(
+        first_name="Noah",
+        last_name="Brown",
+        parent_first_name="Ashley",
+        parent_last_name="Brown",
+        parent_email="ashley.brown@email.com",
+        birth_date="2017-01-22",
+        parent_phone="555-200-0003",
+        notes="Prefers visual examples."
+    )
+
+    student4_id = create_student(
+        first_name="Olivia",
+        last_name="Davis",
+        parent_first_name="Michael",
+        parent_last_name="Davis",
+        parent_email="michael.davis@email.com",
+        birth_date="2014-11-15",
+        parent_phone="555-200-0004",
+        notes="Advanced reading level."
+    )
+
+    student5_id = create_student(
+        first_name="Ethan",
+        last_name="Miller",
+        parent_first_name="Jessica",
+        parent_last_name="Miller",
+        parent_email="jessica.miller@email.com",
+        birth_date="2016-07-30",
+        parent_phone="555-200-0005",
+        notes="Needs short breaks during lessons."
+    )
+
+    # Pick teachers for lessons
+    # Admin also has a teacher profile, so teacher1_user_id can be used as teacher_id.
+    if teacher1_user_id and student1_id:
+        create_lesson(
+            teacher_id=teacher1_user_id,
+            student_id=student1_id,
+            lesson_date="2026-07-08",
+            start_time="09:00",
+            end_time="10:00",
+            status="scheduled",
+            location="Teaching Center",
+            notes="Practice reading short passages and review vocabulary."
+        )
+
+    if teacher2_user_id and student2_id:
+        create_lesson(
+            teacher_id=teacher2_user_id,
+            student_id=student2_id,
+            lesson_date="2026-07-08",
+            start_time="10:30",
+            end_time="11:30",
+            status="scheduled",
+            location="Teaching Center",
+            notes="Work on multiplication review and focus exercises."
+        )
+
+    if teacher2_user_id and student3_id:
+        create_lesson(
+            teacher_id=teacher2_user_id,
+            student_id=student3_id,
+            lesson_date="2026-07-09",
+            start_time="13:00",
+            end_time="14:00",
+            status="scheduled",
+            location="Teaching Center",
+            notes="Use visual flashcards and sentence matching."
+        )
+
+    if teacher3_user_id and student4_id:
+        create_lesson(
+            teacher_id=teacher3_user_id,
+            student_id=student4_id,
+            lesson_date="2026-07-10",
+            start_time="15:00",
+            end_time="16:00",
+            status="completed",
+            location="Teaching Center",
+            notes="Completed reading comprehension worksheet."
+        )
+
+    if teacher3_user_id and student5_id:
+        create_lesson(
+            teacher_id=teacher3_user_id,
+            student_id=student5_id,
+            lesson_date="2026-07-11",
+            start_time="11:00",
+            end_time="12:00",
+            status="scheduled",
+            location="Online",
+            notes="Try shorter activities with breaks between sections."
+        )
+
+    print("Dummy data inserted.")
+
+def reset_dummy_data():
+    connection, cursor = create_connection()
+
+    cursor.execute("DELETE FROM lessons")
+    cursor.execute("DELETE FROM students")
+    cursor.execute("DELETE FROM teachers")
+    cursor.execute("DELETE FROM users")
+
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='lessons'")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='students'")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+
+    connection.commit()
+    connection.close()
+
+    print("Old dummy data deleted.")
+    seed_dummy_data()
+
+#temp data set
+# if __name__ == "__main__":
+#     reset_dummy_data()

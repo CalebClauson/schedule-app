@@ -1,4 +1,7 @@
-/* Main page */
+/* ============================
+   Base Page
+============================ */
+
 body {
     margin: 0;
     font-family: "Roboto", Arial, sans-serif;
@@ -6,45 +9,15 @@ body {
     color: #e5e7eb;
 }
 
-/* Layout */
 .page {
     padding: 30px;
 }
 
-.card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #334155;
-    max-width: 350px;
-    margin: 0 auto 15px auto;
-}
 
-.schedule-card {
-    max-width: 800px;
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #334155;
-    margin: 0 auto 15px auto;
-}
+/* ============================
+   Text
+============================ */
 
-.schedule-card h2 {
-    color: #60a5fa;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.schedule-card p {
-    margin-bottom: 8px;
-    color: #e5e7eb;
-}
-
-.schedule-card strong {
-    color: #bfdbfe;
-}
-
-/* Text */
 h1 {
     text-align: center;
     margin: 0 0 20px 0;
@@ -52,8 +25,19 @@ h1 {
     color: #60a5fa;
 }
 
+h2 {
+    color: #60a5fa;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 p {
-    margin: 0;
+    margin: 0 0 8px 0;
+    color: #e5e7eb;
+}
+
+strong {
+    color: #bfdbfe;
 }
 
 .dashboard-subtitle {
@@ -62,7 +46,33 @@ p {
     margin-top: 10px;
 }
 
-/* Forms */
+
+/* ============================
+   Cards / Containers
+============================ */
+
+.card,
+.schedule-card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    margin: 0 auto 15px auto;
+}
+
+.card {
+    max-width: 350px;
+}
+
+.schedule-card {
+    max-width: 800px;
+}
+
+
+/* ============================
+   Forms
+============================ */
+
 label {
     display: block;
     text-align: center;
@@ -71,7 +81,8 @@ label {
     font-weight: bold;
 }
 
-input {
+input,
+textarea {
     display: block;
     width: 100%;
     box-sizing: border-box;
@@ -84,7 +95,15 @@ input {
     border-radius: 8px;
 }
 
-/* Buttons */
+textarea {
+    resize: vertical;
+}
+
+
+/* ============================
+   Buttons
+============================ */
+
 button,
 .button {
     font-family: "Roboto", Arial, sans-serif;
@@ -96,6 +115,8 @@ button,
     background-color: #2563eb;
     color: white;
     cursor: pointer;
+    text-decoration: none;
+    text-align: center;
 }
 
 button:hover,
@@ -103,7 +124,17 @@ button:hover,
     background-color: #1d4ed8;
 }
 
-/* Schedule table */
+.button-small {
+    display: inline-block;
+    width: auto;
+    margin: 15px 0;
+}
+
+
+/* ============================
+   Schedule Table
+============================ */
+
 .schedule-table {
     width: 100%;
     border-collapse: collapse;

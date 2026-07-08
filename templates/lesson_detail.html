@@ -1,6 +1,8 @@
 {% extends 'base_template.html' %}
 
-{% block content %}
+{% block title %}Lesson Detail{% endblock %}
+
+{% block body %}
 <div class="page">
     <h1>Lesson Detail</h1>
 
@@ -14,23 +16,34 @@
 
         <br>
 
-        <h2>Student Information</h2>
-
-        <p><strong>Name:</strong> {{ lesson[6] }} {{ lesson[7] }}</p>
-        <p><strong>Email:</strong> {{ lesson[8] }}</p>
-        <p><strong>Phone:</strong> {{ lesson[9] }}</p>
+        <h2>Lesson Notes</h2>
+        
+        <form method="POST" action="{{ url_for('update_notes', lesson_id=lesson[0]) }}">
+            <textarea name="notes" rows="6" required>{{ lesson[6] }}</textarea>
+        
+            <button type="submit">Save Notes</button>
+        </form>
 
         <br>
 
-        <h2>Lesson Notes</h2>
-        <p>{{ lesson[10] }}</p>
-
+        <h2>Student Information</h2>
+        
+        <p><strong>Name:</strong> {{ lesson[8] }} {{ lesson[9] }}</p>
+        <p><strong>Parent:</strong> {{ lesson[10] }} {{ lesson[11] }}</p>
+        <p><strong>Phone:</strong> {{ lesson[12] }}</p>
+        <p><strong>Email:</strong> {{ lesson[13] }}</p>
+        <p><strong>Birth Date:</strong> {{ lesson[14] }}</p>
         <br>
 
         <h2>Student Notes</h2>
-        <p>{{ lesson[11] }}</p>
+        
+        <form method="POST" action="{{ url_for('update_student_notes_route', student_id=lesson[7], lesson_id=lesson[0]) }}">
+            <textarea name="student_notes" rows="6" required>{{ lesson[15] }}</textarea>
+        
+            <button type="submit">Save Student Notes</button>
+        </form>
 
-        <a class="button" href="/schedule">Back to Schedule</a>
+        <a class="button button-small" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
     </div>
 </div>
 {% endblock %}

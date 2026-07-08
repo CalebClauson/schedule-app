@@ -15,27 +15,52 @@
     <div class="schedule-card">
         <h2>Today's Schedule</h2>
 
+        {% if lessons %}
         <table class="schedule-table">
             <thead>
                 <tr>
                     <th>Time</th>
                     <th>Lesson</th>
                     <th>Student</th>
-                    <th>Age</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>Details</th>
                 </tr>
             </thead>
 
             <tbody>
-                {% for time in time_slots %}
+                {% for lesson in lessons %}
                 <tr>
-                    <td class="time-column">{{ time }}</td>
+                    <td class="time-column">{{ lesson[2] }} - {{ lesson[3] }}</td>
+
                     <td class="lesson-column">
-                        Available
+                        {{ lesson[8] }}
+                    </td>
+
+                    <td>
+                        {{ lesson[4] }} {{ lesson[5] }}
+                    </td>
+
+                    <td>
+                        {{ lesson[6] }}
+                    </td>
+
+                    <td>
+                        {{ lesson[7] }}
+                    </td>
+
+                    <td>
+                        <a class="button" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                            View
+                        </a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
+            <p>No lessons scheduled for today.</p>
+        {% endif %}
     </div>
 
 </div>
