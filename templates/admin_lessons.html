@@ -1,0 +1,56 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Admin Lessons{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    <div class="card">
+        <h1>All Lessons</h1>
+        <p class="dashboard-subtitle">View all scheduled lessons in the system.</p>
+    </div>
+
+    <div class="schedule-card">
+        {% if lessons %}
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Teacher</th>
+                    <th>Student</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for lesson in lessons %}
+                <tr>
+                    <td>{{ lesson[0] }}</td>
+                    <td>{{ lesson[1] }}</td>
+                    <td>{{ lesson[2] }} - {{ lesson[3] }}</td>
+                    <td>{{ lesson[4] }} {{ lesson[5] }}</td>
+                    <td>{{ lesson[6] }} {{ lesson[7] }}</td>
+                    <td>{{ lesson[8] }}</td>
+                    <td>{{ lesson[9] }}</td>
+                    <td>
+                        <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No lessons found.</p>
+        {% endif %}
+
+        <a class="button button-small" href="{{ url_for('admin') }}">Back to Admin</a>
+    </div>
+
+</div>
+{% endblock %}

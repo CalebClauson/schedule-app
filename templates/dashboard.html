@@ -1,9 +1,7 @@
 {% extends 'base_template.html' %}
 
-<!-- title -->
 {% block title %}Dashboard{% endblock %}
 
-<!-- block body -->
 {% block body %}
 <div class="page">
 
@@ -84,5 +82,8 @@
         updateClock();
         setInterval(updateClock, 1000);
     </script>
+</div>
+<div class="schedule-card">
+    <a class="button button-small" href="{{ url_for('logout') }}">Logout</a>
 </div>
 {% endblock %}
