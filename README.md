@@ -1,7 +1,7 @@
 # Schedule App
 
 This project is still under active development.
-The database helper layer is mostly built, and the Flask app now has a working login flow, protected routes, a dashboard schedule view, lesson detail pages, and editable lesson/student notes.
+The database helper layer is mostly built, and the Flask app now has a working login flow alongside password hashing, protected routes, a dashboard schedule view, lesson detail pages, and editable lesson/student notes.
 
 ## Project Idea
 
@@ -67,11 +67,12 @@ Current features and structure include:
 - Basic HTML template structure
 - Base template setup
 - Initial CSS styling
-- Argon2 password hashing dependency installed for future login work
+- Argon2 password hashing
+- Admin panel | Admin Panel Subroutes
 
 ## Current Login Note
 
-The app currently uses plain text passwords for early development testing.
+App now has functional password hashing
 
 Example test accounts:
 
