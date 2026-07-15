@@ -1,11 +1,34 @@
 import sqlite3
 from helpers import add_minutes
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+
+
+# ============================
+# Password Work 
+# ============================
+# Password Hashing 
+password_hasher = PasswordHasher()
+
+def hash_password(password):
+    # Turns a plain password into a secure Argon2 password hash
+    return password_hasher.hash(password)
+
+
+def verify_password(stored_password_hash, password):
+    # Checks if the typed password matches the stored password hash
+    try:
+        return password_hasher.verify(stored_password_hash, password)
+    except VerifyMismatchError:
+        return False
+    except Exception:
+        return False
 
 # ============================
 # TABLE CREATION (ONE TIME USE)
 # ============================
 
-#created db alread | do not recreate unless you want to lose data
+#created db already | do not recreate unless you want to lose data
 def create_db():
     connection = sqlite3.connect("schedule_app.db")
     connection.execute("PRAGMA foreign_keys = ON")  # enable FK constraints
@@ -51,10 +74,12 @@ def create_connection():
 # USERS TABLE
 # ============================
 
-def create_user(username, password_hash, email, role='teacher', is_active=1):
+def create_user(username, password, email, role='teacher', is_active=1):
     connection, cursor = create_connection()
+    password_hash = hash_password(password)
+
     try:
-        cursor.execute("""INSERT INTO users(username, password_hash, email, role, is_active) VALUES (?, ?, ?, ?, ?)""", (username, password_hash, email, role, is_active))
+        cursor.execute("INSERT INTO users(username, password_hash, email, role, is_active) VALUES (?, ?, ?, ?, ?)", (username, password_hash, email, role, is_active))
         user_id = cursor.lastrowid
         connection.commit()
         return user_id
@@ -453,21 +478,21 @@ def seed_dummy_data():
     # Create teacher users first
     teacher1_user_id = create_user(
         username="admin",
-        password_hash="test123",
+        password="test123",
         email="admin@email.com",
         role="admin"
     )
 
     teacher2_user_id = create_user(
         username="teacher1",
-        password_hash="test123",
+        password="test123",
         email="teacher1@email.com",
         role="teacher"
     )
 
     teacher3_user_id = create_user(
         username="teacher2",
-        password_hash="test123",
+        password="test123",
         email="teacher2@email.com",
         role="teacher"
     )
@@ -643,4 +668,4 @@ def reset_dummy_data():
 
 #temp data set
 # if __name__ == "__main__":
-#     reset_dummy_data()
+# reset_dummy_data()

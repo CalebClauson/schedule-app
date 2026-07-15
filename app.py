@@ -2,7 +2,7 @@ from venv import create
 
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, session
-from database import create_connection, update_lesson_notes, edit_student_notes
+from database import create_connection, update_lesson_notes, edit_student_notes, verify_password
 import sqlite3
 
 # zed isnt understanding we HAVE Flask
@@ -32,7 +32,7 @@ def login():
             error = "Invalid username or password."
         elif user[5] != 1:
             error = "This account is inactive."
-        elif user[2] != password:
+        elif not verify_password(user[2], password):
             error = "Invalid username or password."
         else:
             session["user_id"] = user[0]
