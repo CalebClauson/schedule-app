@@ -5,51 +5,65 @@
 {% block body %}
 <div class="page">
 
-    <div class="card">
-        <h1>All Lessons</h1>
-        <p class="dashboard-subtitle">View all scheduled lessons in the system.</p>
+    <h1>All Lessons</h1>
+
+    <div class="page-actions-top">
+        <a class="button button-small" href="{{ url_for('admin') }}">
+            ← Back to Admin
+        </a>
     </div>
 
     <div class="schedule-card">
+        <div class="detail-header">
+            <div>
+                <h2>Lesson Schedule</h2>
+                <p class="detail-subtitle">View all scheduled lessons in the system.</p>
+            </div>
+
+            <span class="role-badge">{{ lessons|length }} Lessons</span>
+        </div>
+
         {% if lessons %}
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Teacher</th>
-                    <th>Student</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Teacher</th>
+                        <th>Student</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                {% for lesson in lessons %}
-                <tr>
-                    <td>{{ lesson[0] }}</td>
-                    <td>{{ lesson[1] }}</td>
-                    <td>{{ lesson[2] }} - {{ lesson[3] }}</td>
-                    <td>{{ lesson[4] }} {{ lesson[5] }}</td>
-                    <td>{{ lesson[6] }} {{ lesson[7] }}</td>
-                    <td>{{ lesson[8] }}</td>
-                    <td>{{ lesson[9] }}</td>
-                    <td>
-                        <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <tbody>
+                    {% for lesson in lessons %}
+                    <tr>
+                        <td>{{ lesson[0] }}</td>
+                        <td>{{ lesson[1] | format_date }}</td>
+                        <td>{{ lesson[2] | format_time }} - {{ lesson[3] | format_time }}</td>
+                        <td>{{ lesson[4] }} {{ lesson[5] }}</td>
+                        <td>{{ lesson[6] }} {{ lesson[7] }}</td>
+                        <td>
+                            <span class="status status-{{ lesson[8] }}">
+                                {{ lesson[8] | title }}
+                            </span>
+                        </td>
+                        <td>{{ lesson[9] }}</td>
+                        <td>
+                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-            <p>No lessons found.</p>
+            <p class="empty-state">No lessons found.</p>
         {% endif %}
-
-        <a class="button button-small" href="{{ url_for('admin') }}">Back to Admin</a>
     </div>
 
 </div>

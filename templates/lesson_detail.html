@@ -4,46 +4,183 @@
 
 {% block body %}
 <div class="page">
-    <h1>Lesson Detail</h1>
 
-    <div class="schedule-card">
-        <h2>Lesson Information</h2>
+    {% if edit_mode %}
+        <h1>Edit Lesson</h1>
 
-        <p><strong>Date:</strong> {{ lesson[1] }}</p>
-        <p><strong>Time:</strong> {{ lesson[2] }} - {{ lesson[3] }}</p>
-        <p><strong>Status:</strong> {{ lesson[4] }}</p>
-        <p><strong>Location:</strong> {{ lesson[5] }}</p>
+        <div class="page-actions-top">
+            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                ← Cancel Edit
+            </a>
+        </div>
 
-        <br>
+        <div class="schedule-card detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2>Lesson Information</h2>
+                    <p class="detail-subtitle">Update lesson details, assigned teacher, and assigned student.</p>
+                </div>
 
-        <h2>Lesson Notes</h2>
-        
-        <form method="POST" action="{{ url_for('update_notes', lesson_id=lesson[0]) }}">
-            <textarea name="notes" rows="6" required>{{ lesson[6] }}</textarea>
-        
-            <button type="submit">Save Notes</button>
-        </form>
+                <span class="role-badge">Editing</span>
+            </div>
 
-        <br>
+            <form method="POST" action="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}" class="inline-edit-form">
 
-        <h2>Student Information</h2>
-        
-        <p><strong>Name:</strong> {{ lesson[8] }} {{ lesson[9] }}</p>
-        <p><strong>Parent:</strong> {{ lesson[10] }} {{ lesson[11] }}</p>
-        <p><strong>Phone:</strong> {{ lesson[12] }}</p>
-        <p><strong>Email:</strong> {{ lesson[13] }}</p>
-        <p><strong>Birth Date:</strong> {{ lesson[14] }}</p>
-        <br>
+                <label>Teacher</label>
+                <select name="teacher_id" required>
+                    {% for teacher in teachers %}
+                        <option value="{{ teacher[0] }}" {% if teacher[0] == raw_lesson[1] %}selected{% endif %}>
+                            {{ teacher[1] }} {{ teacher[2] }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-        <h2>Student Notes</h2>
-        
-        <form method="POST" action="{{ url_for('update_student_notes_route', student_id=lesson[7], lesson_id=lesson[0]) }}">
-            <textarea name="student_notes" rows="6" required>{{ lesson[15] }}</textarea>
-        
-            <button type="submit">Save Student Notes</button>
-        </form>
+                <label>Student</label>
+                <select name="student_id" required>
+                    {% for student in students %}
+                        <option value="{{ student[0] }}" {% if student[0] == raw_lesson[2] %}selected{% endif %}>
+                            {{ student[1] }} {{ student[2] }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-        <a class="button button-small" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
-    </div>
+                <label>Date</label>
+                <input type="date" name="lesson_date" value="{{ raw_lesson[3] }}" required>
+
+                <label>Start Time</label>
+                <input type="time" name="start_time" value="{{ raw_lesson[4] }}" required>
+
+                <label>End Time</label>
+                <input type="time" name="end_time" value="{{ raw_lesson[5] }}" required>
+
+                <label>Status</label>
+                <select name="status" required>
+                    <option value="scheduled" {% if raw_lesson[6] == "scheduled" %}selected{% endif %}>Scheduled</option>
+                    <option value="completed" {% if raw_lesson[6] == "completed" %}selected{% endif %}>Completed</option>
+                    <option value="canceled" {% if raw_lesson[6] == "canceled" %}selected{% endif %}>Canceled</option>
+                </select>
+
+                <label>Location</label>
+                <input type="text" name="location" value="{{ raw_lesson[7] }}" required>
+
+                <label>Lesson Notes</label>
+                <textarea name="notes" rows="6">{{ raw_lesson[8] }}</textarea>
+
+                <button type="submit">Save Lesson Changes</button>
+            </form>
+        </div>
+
+    {% else %}
+        <h1>Lesson Detail</h1>
+
+        <div class="page-actions-top">
+            {% if session.get("role") == "admin" %}
+                <a class="button button-small" href="{{ url_for('admin') }}">
+                    ← Back to Admin
+                </a>
+            {% else %}
+                <a class="button button-small" href="{{ url_for('dashboard') }}">
+                    ← Back to Dashboard
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="schedule-card detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2>Lesson Information</h2>
+                    <p class="detail-subtitle">Lesson details and assigned student information.</p>
+                </div>
+
+                <div class="detail-header-actions">
+                    <span class="status status-{{ lesson[4] }}">
+                        {{ lesson[4] | title }}
+                    </span>
+
+                    {% if session.get("role") == "admin" %}
+                        <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], edit=1) }}">
+                            Edit Lesson
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span>Date</span>
+                    <strong>{{ lesson[1] | format_date }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Time</span>
+                    <strong>{{ lesson[2] | format_time }} - {{ lesson[3] | format_time }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Status</span>
+                    <strong>{{ lesson[4] | title }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Location</span>
+                    <strong>{{ lesson[5] }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Student</span>
+                    <strong>{{ lesson[8] }} {{ lesson[9] }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Parent</span>
+                    <strong>{{ lesson[10] }} {{ lesson[11] }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Phone</span>
+                    <strong>{{ lesson[12] }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Email</span>
+                    <strong>{{ lesson[13] }}</strong>
+                </div>
+
+                <div class="detail-item detail-wide">
+                    <span>Birth Date</span>
+                    <strong>{{ lesson[14] | format_date }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="schedule-card detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2>Lesson Notes</h2>
+                    <p class="detail-subtitle">Notes for this specific lesson.</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('update_notes', lesson_id=lesson[0]) }}">
+                <textarea name="notes" rows="6" required>{{ lesson[6] }}</textarea>
+                <button type="submit">Save Notes</button>
+            </form>
+        </div>
+
+        <div class="schedule-card detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2>Student Notes</h2>
+                    <p class="detail-subtitle">General notes attached to this student.</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('update_student_notes_route', student_id=lesson[7], lesson_id=lesson[0]) }}">
+                <textarea name="student_notes" rows="6" required>{{ lesson[15] }}</textarea>
+                <button type="submit">Save Student Notes</button>
+            </form>
+        </div>
+    {% endif %}
+
 </div>
 {% endblock %}

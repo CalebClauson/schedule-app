@@ -5,45 +5,69 @@
 {% block body %}
 <div class="page">
 
-    <div class="card">
-        <h1>Teachers</h1>
-        <p class="dashboard-subtitle">View teacher accounts and teacher profile details.</p>
+    <h1>Teachers</h1>
+
+    <div class="page-actions-top">
+        <a class="button button-small" href="{{ url_for('admin') }}">
+            ← Back to Admin
+        </a>
     </div>
 
     <div class="schedule-card">
+        <div class="detail-header">
+            <div>
+                <h2>Teacher Accounts</h2>
+                <p class="detail-subtitle">View teacher accounts and teacher profile details.</p>
+            </div>
+
+            <span class="role-badge">{{ teachers|length }} Teachers</span>
+        </div>
+
         {% if teachers %}
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>User ID</th>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Max Students</th>
-                    <th>Active</th>
-                </tr>
-            </thead>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Max Students</th>
+                        <th>Role</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                {% for teacher in teachers %}
-                <tr>
-                    <td>{{ teacher[0] }}</td>
-                    <td>{{ teacher[5] }} {{ teacher[6] }}</td>
-                    <td>{{ teacher[1] }}</td>
-                    <td>{{ teacher[2] }}</td>
-                    <td>{{ teacher[7] }}</td>
-                    <td>{{ teacher[8] }}</td>
-                    <td>{{ teacher[4] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr>
+                        <td>{{ teacher[0] }}</td>
+                        <td>{{ teacher[5] }} {{ teacher[6] }}</td>
+                        <td>{{ teacher[1] }}</td>
+                        <td>{{ teacher[2] }}</td>
+                        <td>{{ teacher[7] }}</td>
+                        <td>{{ teacher[8] }}</td>
+                        <td>{{ teacher[3] | title }}</td>
+                        <td>
+                            {% if teacher[4] == 1 %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="button button-small" href="{{ url_for('admin_teacher_detail', user_id=teacher[0]) }}">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-            <p>No teachers found.</p>
+            <p class="empty-state">No teachers found.</p>
         {% endif %}
-
-        <a class="button button-small" href="{{ url_for('admin') }}">Back to Admin</a>
     </div>
 
 </div>

@@ -1,0 +1,126 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Student Detail{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    {% if edit_mode %}
+        <h1>Edit Student</h1>
+
+        <div class="page-actions-top">
+            <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0]) }}">
+                ← Cancel Edit
+            </a>
+        </div>
+
+        <div class="schedule-card detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2>{{ student[1] }} {{ student[2] }}</h2>
+                    <p class="detail-subtitle">Update student and parent contact information.</p>
+                </div>
+
+                <span class="role-badge">Editing</span>
+            </div>
+
+            <form method="POST" action="{{ url_for('admin_student_detail', student_id=student[0]) }}">
+
+                <label>First Name</label>
+                <input type="text" name="first_name" value="{{ student[1] }}" required>
+
+                <label>Last Name</label>
+                <input type="text" name="last_name" value="{{ student[2] }}" required>
+
+                <label>Parent First Name</label>
+                <input type="text" name="parent_first_name" value="{{ student[3] }}" required>
+
+                <label>Parent Last Name</label>
+                <input type="text" name="parent_last_name" value="{{ student[4] }}" required>
+
+                <label>Parent Email</label>
+                <input type="email" name="parent_email" value="{{ student[5] }}" required>
+
+                <label>Birth Date</label>
+                <input type="date" name="birth_date" value="{{ student[6] }}" required>
+
+                <label>Parent Phone</label>
+                <input type="text" name="parent_phone" value="{{ student[7] }}" required>
+
+                <label>Notes</label>
+                <textarea name="notes" rows="6">{{ student[8] }}</textarea>
+
+                <button type="submit">Save Student Changes</button>
+            </form>
+        </div>
+
+    {% else %}
+        <h1>Student Detail</h1>
+
+        <div class="page-actions-top">
+            <a class="button button-small" href="{{ url_for('admin_students') }}">
+                ← Back to Students
+            </a>
+        </div>
+
+        <div class="schedule-card detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2>{{ student[1] }} {{ student[2] }}</h2>
+                    <p class="detail-subtitle">Student record and parent contact details.</p>
+                </div>
+
+                <div class="detail-header-actions">
+                    <span class="role-badge">Student</span>
+
+                    <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0], edit=1) }}">
+                        Edit Student
+                    </a>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span>Student ID</span>
+                    <strong>{{ student[0] }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Birth Date</span>
+                    <strong>{{ student[6] | format_date }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Parent</span>
+                    <strong>{{ student[3] }} {{ student[4] }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Parent Phone</span>
+                    <strong>{{ student[7] }}</strong>
+                </div>
+
+                <div class="detail-item detail-wide">
+                    <span>Parent Email</span>
+                    <strong>{{ student[5] }}</strong>
+                </div>
+
+                <div class="detail-item detail-wide">
+                    <span>Notes</span>
+                    <strong>{{ student[8] }}</strong>
+                </div>
+            </div>
+
+            <div class="danger-zone">
+                <p class="danger-title">Danger Zone</p>
+                <p class="danger-text">Deactivate this student without deleting their lesson history.</p>
+
+                <form method="POST" action="{{ url_for('admin_deactivate_student', student_id=student[0]) }}" onsubmit="return confirm('Deactivate this student?');">
+                    <button class="button-danger" type="submit">Deactivate Student</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

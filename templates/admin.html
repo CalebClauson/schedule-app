@@ -5,92 +5,159 @@
 {% block body %}
 <div class="page">
 
-    <div class="card">
-        <h1>Admin Panel</h1>
-        <p class="dashboard-subtitle">System overview and management tools.</p>
-        <p class="dashboard-subtitle">
-            <strong>Date:</strong> {{ today }}.
-        </p>
-        <p class="dashboard-time">
-            <strong>Current time:<strong> <span id="current-time">{{ current_time }}</span>
-        </p>
-    </div>
+    <h1>Admin Dashboard</h1>
 
-    <div class="schedule-card">
-        <h2>Quick Actions</h2>
+    <div class="schedule-card detail-card">
+        <div class="detail-header">
+            <div>
+                <h2>Welcome, Admin</h2>
+                <p class="detail-subtitle">
+                    System overview and management tools for {{ today }}.
+                </p>
+            </div>
 
-        <div class="admin-actions">
-            <a class="button button-small" href="{{ url_for('admin_lessons') }}">View Lessons</a>
-            <a class="button button-small" href="{{ url_for('admin_teachers') }}">Manage Teachers</a>
-            <a class="button button-small" href="{{ url_for('admin_students') }}">Manage Students</a>
+            <div class="detail-header-actions">
+                <span class="role-badge">
+                    <span id="current-time">{{ current_time }}</span>
+                </span>
+
+                <a class="button button-small" href="{{ url_for('logout') }}">
+                    Logout
+                </a>
+            </div>
         </div>
     </div>
 
     <div class="schedule-card">
-        <h2>Overview</h2>
+        <div class="detail-header">
+            <div>
+                <h2>Quick Actions</h2>
+                <p class="detail-subtitle">Jump into admin management pages.</p>
+            </div>
 
-        <p><strong>Total Lessons:</strong> {{ lesson_count }}</p>
-        <p><strong>Active Teachers:</strong> {{ teacher_count }}</p>
-        <p><strong>Active Students:</strong> {{ student_count }}</p>
+            <span class="role-badge">Admin</span>
+        </div>
+
+        <div class="admin-actions">
+            <a class="button button-small" href="{{ url_for('admin_lessons') }}">
+                View Lessons
+            </a>
+
+            <a class="button button-small" href="{{ url_for('admin_teachers') }}">
+                Manage Teachers
+            </a>
+
+            <a class="button button-small" href="{{ url_for('admin_students') }}">
+                Manage Students
+            </a>
+        </div>
+    </div>
+
+    <div class="schedule-card detail-card">
+        <div class="detail-header">
+            <div>
+                <h2>Overview</h2>
+                <p class="detail-subtitle">Current system totals.</p>
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span>Total Lessons</span>
+                <strong>{{ lesson_count }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Active Teachers</span>
+                <strong>{{ teacher_count }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Active Students</span>
+                <strong>{{ student_count }}</strong>
+            </div>
+
+            <div class="detail-item">
+                <span>Admin Tools</span>
+                <strong>Enabled</strong>
+            </div>
+        </div>
     </div>
 
     <div class="schedule-card">
-        <h2>Lesson Preview</h2>
+        <div class="detail-header">
+            <div>
+                <h2>Lesson Preview</h2>
+                <p class="detail-subtitle">Upcoming lessons across all teachers.</p>
+            </div>
+
+            <span class="role-badge">{{ upcoming_lessons|length }} Showing</span>
+        </div>
 
         {% if upcoming_lessons %}
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Teacher</th>
-                    <th>Student</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Teacher</th>
+                        <th>Student</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                {% for lesson in upcoming_lessons %}
-                <tr>
-                    <td>{{ lesson[1] }}</td>
-                    <td>{{ lesson[2] }} - {{ lesson[3] }}</td>
-                    <td>{{ lesson[4] }} {{ lesson[5] }}</td>
-                    <td>{{ lesson[6] }} {{ lesson[7] }}</td>
-                    <td>{{ lesson[8] }}</td>
-                    <td>{{ lesson[9] }}</td>
-                    <td>
-                        <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <tbody>
+                    {% for lesson in upcoming_lessons %}
+                    <tr>
+                        <td>{{ lesson[1] | format_date }}</td>
+
+                        <td>
+                            {{ lesson[2] | format_time }} - {{ lesson[3] | format_time }}
+                        </td>
+
+                        <td>{{ lesson[4] }} {{ lesson[5] }}</td>
+
+                        <td>{{ lesson[6] }} {{ lesson[7] }}</td>
+
+                        <td>
+                            <span class="status status-{{ lesson[8] }}">
+                                {{ lesson[8] | title }}
+                            </span>
+                        </td>
+
+                        <td>{{ lesson[9] }}</td>
+
+                        <td>
+                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-            <p>No lessons found.</p>
+            <p class="empty-state">No lessons found.</p>
         {% endif %}
     </div>
+
     <script>
         function updateClock() {
             const now = new Date();
-    
+
             const time = now.toLocaleTimeString([], {
                 hour: "numeric",
-                minute: "2-digit",
+                minute: "2-digit"
             });
-    
+
             document.getElementById("current-time").textContent = time;
         }
-    
+
         updateClock();
         setInterval(updateClock, 1000);
     </script>
-    <div class="schedule-card">
-        <a class="button button-small" href="{{ url_for('logout') }}">Logout</a>
-    </div>
 
 </div>
 {% endblock %}

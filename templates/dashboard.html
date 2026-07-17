@@ -5,85 +5,106 @@
 {% block body %}
 <div class="page">
 
-    <div class="card">
-        <h1>Welcome, {{ username }}</h1>
-    
-        <p class="dashboard-subtitle">
-            Here is <strong>Today's Schedule</strong> for {{ today }}.
-        </p>
-    
-        <p class="dashboard-time">
-            Current time: <span id="current-time">{{ current_time }}</span>
-        </p>
+    <h1>Teacher Dashboard</h1>
+
+    <div class="schedule-card detail-card">
+        <div class="detail-header">
+            <div>
+                <h2>Welcome, {{ username }}</h2>
+                <p class="detail-subtitle">
+                    Here is today's schedule for {{ today }}.
+                </p>
+            </div>
+
+            <div class="detail-header-actions">
+                <span class="role-badge">
+                    <span id="current-time">{{ current_time }}</span>
+                </span>
+
+                <a class="button button-small" href="{{ url_for('logout') }}">
+                    Logout
+                </a>
+            </div>
+        </div>
     </div>
 
     <div class="schedule-card">
-        <h2>Today's Schedule</h2>
+        <div class="detail-header">
+            <div>
+                <h2>Today's Schedule</h2>
+                <p class="detail-subtitle">Your scheduled lessons for today.</p>
+            </div>
+
+            <span class="role-badge">{{ lessons|length }} Lessons</span>
+        </div>
 
         {% if lessons %}
-        <table class="schedule-table">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Lesson</th>
-                    <th>Student</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Lesson</th>
+                        <th>Student</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                {% for lesson in lessons %}
-                <tr>
-                    <td class="time-column">{{ lesson[2] }} - {{ lesson[3] }}</td>
+                <tbody>
+                    {% for lesson in lessons %}
+                    <tr>
+                        <td class="time-column">
+                            {{ lesson[2] | format_time }} - {{ lesson[3] | format_time }}
+                        </td>
 
-                    <td class="lesson-column">
-                        {{ lesson[8] }}
-                    </td>
+                        <td class="lesson-column">
+                            {{ lesson[8] }}
+                        </td>
 
-                    <td>
-                        {{ lesson[4] }} {{ lesson[5] }}
-                    </td>
+                        <td>
+                            {{ lesson[4] }} {{ lesson[5] }}
+                        </td>
 
-                    <td>
-                        {{ lesson[6] }}
-                    </td>
+                        <td>
+                            <span class="status status-{{ lesson[6] }}">
+                                {{ lesson[6] | title }}
+                            </span>
+                        </td>
 
-                    <td>
-                        {{ lesson[7] }}
-                    </td>
+                        <td>
+                            {{ lesson[7] }}
+                        </td>
 
-                    <td>
-                        <a class="button" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <td>
+                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-            <p>No lessons scheduled for today.</p>
+            <p class="empty-state">No lessons scheduled for today.</p>
         {% endif %}
     </div>
+
     <script>
         function updateClock() {
             const now = new Date();
-    
+
             const time = now.toLocaleTimeString([], {
                 hour: "numeric",
-                minute: "2-digit",
+                minute: "2-digit"
             });
-    
+
             document.getElementById("current-time").textContent = time;
         }
-    
+
         updateClock();
         setInterval(updateClock, 1000);
     </script>
-</div>
-<div class="schedule-card">
-    <a class="button button-small" href="{{ url_for('logout') }}">Logout</a>
+
 </div>
 {% endblock %}

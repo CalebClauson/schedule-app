@@ -1,8 +1,8 @@
 from venv import create
 
-from datetime import date
-from flask import Flask, render_template, request, redirect, url_for, session
-from database import create_connection, update_lesson_notes, edit_student_notes, verify_password
+from datetime import date, datetime
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role
 import sqlite3
 
 # zed isnt understanding we HAVE Flask
@@ -55,6 +55,36 @@ def admin_required():
 
     return None
 
+def user_can_access_lesson(lesson_id):
+    if session.get("role") == "admin":
+        return True
+
+    connection, cursor = create_connection()
+
+    cursor.execute("SELECT lesson_id FROM lessons WHERE lesson_id = ? AND teacher_id = ?", (lesson_id, session["user_id"]))
+
+    lesson = cursor.fetchone()
+    connection.close()
+
+    return lesson is not None
+
+@app.template_filter("format_date")
+def format_date(value):
+    if not value:
+        return ""
+
+    date_object = datetime.strptime(value, "%Y-%m-%d")
+    return date_object.strftime("%B %d, %Y").replace(" 0", " ")
+
+
+@app.template_filter("format_time")
+def format_time(value):
+    if not value:
+        return ""
+
+    time_object = datetime.strptime(value, "%H:%M")
+    return time_object.strftime("%I:%M %p").lstrip("0")
+
 # Logout route
 # Clears the current user session and sends them back to the login page.
 @app.route("/logout")
@@ -88,14 +118,49 @@ def dashboard():
 # Right now it just loads the lesson_detail.html template.
 # Later, this route should probably use /lessons/<int:lesson_id>
 # so clicking a lesson opens that lesson's specific details.
-@app.route("/lessons/<int:lesson_id>")
+@app.route("/lessons/<int:lesson_id>", methods=["GET", "POST"])
 def lesson_detail(lesson_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    if not user_can_access_lesson(lesson_id):
+        return "Not authorized", 403
+
+    edit_mode = request.args.get("edit") == "1" and session.get("role") == "admin"
+
+    if request.method == "POST":
+        if session.get("role") != "admin":
+            return "Not authorized", 403
+
+        teacher_id = request.form["teacher_id"]
+        student_id = request.form["student_id"]
+        lesson_date = request.form["lesson_date"]
+        start_time = request.form["start_time"]
+        end_time = request.form["end_time"]
+        status = request.form["status"]
+        location = request.form["location"]
+        notes = request.form["notes"]
+
+        updated = edit_lesson(
+            lesson_id,
+            teacher_id,
+            student_id,
+            lesson_date,
+            start_time,
+            end_time,
+            status,
+            location,
+            notes
+        )
+
+        if not updated:
+            return "Could not update lesson. Teacher may be booked or at max lessons for the day.", 400
+
+        return redirect(url_for("lesson_detail", lesson_id=lesson_id))
+
     connection, cursor = create_connection()
 
-    cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, lessons.status, lessons.location, lessons.notes, students.student_id, students.first_name, students.last_name, students.parent_first_name, students.parent_last_name, students.parent_phone, students.parent_email, students.birth_date, students.notes FROM lessons JOIN students ON lessons.student_id = students.student_id WHERE lessons.lesson_id = ? AND lessons.teacher_id = ?", (lesson_id, session["user_id"]))
+    cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, lessons.status, lessons.location, lessons.notes, students.student_id, students.first_name, students.last_name, students.parent_first_name, students.parent_last_name, students.parent_phone, students.parent_email, students.birth_date, students.notes FROM lessons JOIN students ON lessons.student_id = students.student_id WHERE lessons.lesson_id = ?", (lesson_id,))
 
     lesson = cursor.fetchone()
     connection.close()
@@ -103,7 +168,23 @@ def lesson_detail(lesson_id):
     if lesson is None:
         return "Lesson not found", 404
 
-    return render_template("lesson_detail.html", lesson=lesson)
+    raw_lesson = None
+    teachers = []
+    students = []
+
+    if session.get("role") == "admin":
+        raw_lesson = get_lesson_by_id(lesson_id)
+        teachers = get_all_teachers()
+        students = get_all_students()
+
+    return render_template(
+        "lesson_detail.html",
+        lesson=lesson,
+        raw_lesson=raw_lesson,
+        teachers=teachers,
+        students=students,
+        edit_mode=edit_mode
+    )
 
 # POST ROUTE to UPDATE lesson notes
 @app.route("/lessons/<int:lesson_id>/notes", methods=["POST"])
@@ -208,6 +289,61 @@ def admin_teachers():
 
     return render_template("admin_teachers.html", teachers=teachers)
 
+@app.route("/admin/teachers/<int:user_id>", methods=["GET", "POST"])
+def admin_teacher_detail(user_id):
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    edit_mode = request.args.get("edit") == "1"
+
+    if request.method == "POST":
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        phone = request.form["phone"]
+        max_students = request.form["max_students"]
+        notes = request.form["notes"]
+        role = request.form["role"]
+        if user_id == session["user_id"] and role != "admin":
+            flash("You cannot remove your own admin role.")
+            return redirect(url_for("admin_teacher_detail", user_id=user_id, edit=1))
+    
+        updated_teacher = edit_teacher(user_id, first_name, last_name, phone, max_students, notes)
+        updated_role = update_user_role(user_id, role)
+    
+        if not updated_teacher or not updated_role:
+            return "Could not update teacher.", 400
+    
+        return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
+    teacher = get_teacher_by_id(user_id)
+
+    if teacher is None:
+        return "Teacher not found", 404
+
+    return render_template(
+        "admin_teacher_detail.html",
+        teacher=teacher,
+        edit_mode=edit_mode
+    )
+
+
+@app.route("/admin/teachers/<int:user_id>/deactivate", methods=["POST"])
+def admin_deactivate_teacher(user_id):
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    if user_id == session["user_id"]:
+        return "You cannot deactivate your own admin account.", 400
+
+    deactivated = deactivate_user(user_id)
+
+    if not deactivated:
+        return "Could not deactivate teacher.", 400
+
+    return redirect(url_for("admin_teachers"))
+
 
 @app.route("/admin/students")
 def admin_students():
@@ -223,6 +359,66 @@ def admin_students():
     connection.close()
 
     return render_template("admin_students.html", students=students)
+
+@app.route("/admin/students/<int:student_id>", methods=["GET", "POST"])
+def admin_student_detail(student_id):
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    edit_mode = request.args.get("edit") == "1"
+
+    if request.method == "POST":
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        parent_first_name = request.form["parent_first_name"]
+        parent_last_name = request.form["parent_last_name"]
+        parent_email = request.form["parent_email"]
+        birth_date = request.form["birth_date"]
+        parent_phone = request.form["parent_phone"]
+        notes = request.form["notes"]
+
+        updated = edit_student(
+            student_id,
+            first_name,
+            last_name,
+            parent_first_name,
+            parent_last_name,
+            parent_email,
+            birth_date,
+            parent_phone,
+            notes
+        )
+
+        if not updated:
+            return "Could not update student.", 400
+
+        return redirect(url_for("admin_student_detail", student_id=student_id))
+
+    student = get_student_by_id(student_id)
+
+    if student is None:
+        return "Student not found", 404
+
+    return render_template(
+        "admin_student_detail.html",
+        student=student,
+        edit_mode=edit_mode
+    )
+
+
+@app.route("/admin/students/<int:student_id>/deactivate", methods=["POST"])
+def admin_deactivate_student(student_id):
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    deactivated = deactivate_student(student_id)
+
+    if not deactivated:
+        return "Could not deactivate student.", 400
+
+    return redirect(url_for("admin_students"))
 
 if __name__ == "__main__":
     app.run(debug=True)

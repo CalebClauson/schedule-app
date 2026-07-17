@@ -1,0 +1,105 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Teacher Detail{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    {% if edit_mode %}
+        <h1>Edit Teacher</h1>
+
+        <div class="schedule-card">
+            <form method="POST" action="{{ url_for('admin_teacher_detail', user_id=teacher[0]) }}">
+
+                <label>First Name</label>
+                <input type="text" name="first_name" value="{{ teacher[1] }}" required>
+
+                <label>Last Name</label>
+                <input type="text" name="last_name" value="{{ teacher[2] }}" required>
+
+                <label>Phone</label>
+                <input type="text" name="phone" value="{{ teacher[3] }}">
+
+                <label>Max Students</label>
+                <input type="number" name="max_students" value="{{ teacher[4] }}" required>
+
+                <label>Role</label>
+                <select name="role" required>
+                    <option value="teacher" {% if teacher[6] == "teacher" %}selected{% endif %}>Teacher</option>
+                    <option value="admin" {% if teacher[6] == "admin" %}selected{% endif %}>Admin</option>
+                </select>
+
+                <label>Notes</label>
+                <textarea name="notes" rows="6">{{ teacher[5] }}</textarea>
+
+                <button type="submit">Save Teacher Changes</button>
+            </form>
+
+            <a class="button button-small" href="{{ url_for('admin_teacher_detail', user_id=teacher[0]) }}">Cancel Edit</a>
+        </div>
+
+        {% else %}
+            <h1>Teacher Detail</h1>
+        
+            <div class="page-actions-top">
+                <a class="button button-small" href="{{ url_for('admin_teachers') }}">
+                    ← Back to Teachers
+                </a>
+            </div>
+        
+            <div class="schedule-card detail-card">
+                <div class="detail-header">
+                    <div>
+                        <h2>{{ teacher[1] }} {{ teacher[2] }}</h2>
+                        <p class="detail-subtitle">Teacher account details</p>
+                    </div>
+        
+                    <div class="detail-header-actions">
+                        <span class="role-badge">{{ teacher[6] | title }}</span>
+        
+                        <a class="button button-small" href="{{ url_for('admin_teacher_detail', user_id=teacher[0], edit=1) }}">
+                            Edit Teacher
+                        </a>
+                    </div>
+                </div>
+        
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span>User ID</span>
+                        <strong>{{ teacher[0] }}</strong>
+                    </div>
+        
+                    <div class="detail-item">
+                        <span>Phone</span>
+                        <strong>{{ teacher[3] }}</strong>
+                    </div>
+        
+                    <div class="detail-item">
+                        <span>Max Students</span>
+                        <strong>{{ teacher[4] }}</strong>
+                    </div>
+        
+                    <div class="detail-item">
+                        <span>Role</span>
+                        <strong>{{ teacher[6] | title }}</strong>
+                    </div>
+        
+                    <div class="detail-item detail-wide">
+                        <span>Notes</span>
+                        <strong>{{ teacher[5] }}</strong>
+                    </div>
+                </div>
+        
+                <div class="danger-zone">
+                    <p class="danger-title">Danger Zone</p>
+                    <p class="danger-text">Deactivate this teacher account without deleting their history.</p>
+        
+                    <form method="POST" action="{{ url_for('admin_deactivate_teacher', user_id=teacher[0]) }}" onsubmit="return confirm('Deactivate this teacher?');">
+                        <button class="button-danger" type="submit">Deactivate Teacher</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+</div>
+{% endblock %}
