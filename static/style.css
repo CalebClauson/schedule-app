@@ -5,7 +5,6 @@
 :root {
     --bg-main: #0b0f14;
     --bg-card: #151a21;
-    --bg-card-soft: #1b222b;
     --bg-input: #0f141a;
 
     --border-soft: #2f3a46;
@@ -137,10 +136,45 @@ strong {
     overflow-x: auto;
 }
 
+.detail-card {
+    max-width: 900px;
+}
+
+
+/* ============================
+   Page Actions
+============================ */
+
+.page-actions-top {
+    max-width: 900px;
+    margin: 0 auto 14px auto;
+}
+
+.page-actions-top .button {
+    margin: 0;
+}
+
 .admin-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+}
+
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+    align-items: center;
+}
+
+.action-row form {
+    margin: 0;
+}
+
+.action-row button,
+.action-row .button {
+    margin: 0;
 }
 
 
@@ -255,28 +289,6 @@ button {
 
 
 /* ============================
-   Action Rows
-============================ */
-
-.action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 28px;
-    align-items: center;
-}
-
-.action-row form {
-    margin: 0;
-}
-
-.action-row button,
-.action-row .button {
-    margin: 0;
-}
-
-
-/* ============================
    Tables
 ============================ */
 
@@ -322,10 +334,6 @@ button {
    Detail Pages
 ============================ */
 
-.detail-card {
-    max-width: 900px;
-}
-
 .detail-header {
     display: flex;
     justify-content: space-between;
@@ -340,6 +348,16 @@ button {
 
 .detail-subtitle {
     color: var(--text-muted);
+    margin: 0;
+}
+
+.detail-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.detail-header-actions .button {
     margin: 0;
 }
 
@@ -380,6 +398,38 @@ button {
 
 .detail-wide {
     grid-column: 1 / -1;
+}
+
+
+/* ============================
+   Danger Zone
+============================ */
+
+.danger-zone {
+    margin-top: 32px;
+    padding: 20px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: var(--radius-md);
+    background-color: rgba(239, 68, 68, 0.06);
+}
+
+.danger-title {
+    margin-bottom: 6px;
+    color: #fecaca;
+    font-weight: 700;
+}
+
+.danger-text {
+    margin-bottom: 16px;
+    color: var(--text-muted);
+}
+
+.danger-zone form {
+    margin: 0;
+}
+
+.danger-zone button {
+    margin: 0;
 }
 
 
@@ -533,6 +583,11 @@ button {
         flex-direction: column;
     }
 
+    .detail-header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
     .detail-grid {
         grid-template-columns: 1fr;
     }
@@ -550,70 +605,8 @@ button {
     .button-small {
         margin-right: 0;
     }
-}
 
-/* ============================
-   Detail Actions
-============================ */
-
-.back-link {
-    display: inline-block;
-    margin: 0 0 14px 0;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.back-link:hover {
-    color: var(--accent-soft);
-}
-
-.detail-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.detail-header-actions .button {
-    margin: 0;
-}
-
-.danger-zone {
-    margin-top: 32px;
-    padding: 20px;
-    border: 1px solid rgba(239, 68, 68, 0.35);
-    border-radius: var(--radius-md);
-    background-color: rgba(239, 68, 68, 0.06);
-}
-
-.danger-title {
-    margin-bottom: 6px;
-    color: #fecaca;
-    font-weight: 700;
-}
-
-.danger-text {
-    margin-bottom: 16px;
-    color: var(--text-muted);
-}
-
-.danger-zone form {
-    margin: 0;
-}
-
-.danger-zone button {
-    margin: 0;
-}
-
-/* ============================
-   Page Top Actions
-============================ */
-
-.page-actions-top {
-    max-width: 900px;
-    margin: 0 auto 14px auto;
-}
-
-.page-actions-top .button {
-    margin: 0;
+    .page-actions-top .button {
+        width: auto;
+    }
 }
