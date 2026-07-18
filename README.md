@@ -389,6 +389,6 @@ Things I may add later:
 
 ## Notes
 
-This project is still in development. The current focus is building a working MVP with secure account management, admin-controlled user creation, and basic lesson scheduling.
+Right now, the goal is to get the main version working first before adding bigger features like reminders, filters, reports, and a real calendar view.
 
 The app has moved past just being a database practice project and now works more like an actual small scheduling system.
