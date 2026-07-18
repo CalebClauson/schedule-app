@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date, timedelta
 from helpers import add_minutes
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -509,6 +510,12 @@ def seed_dummy_data():
     Use this for development/testing only.
     """
 
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    two_days_later = today + timedelta(days=2)
+    three_days_later = today + timedelta(days=3)
+    next_week = today + timedelta(days=7)
+
     # Create teacher users first
     teacher1_user_id = create_user(username="admin", password="test123", email="admin@email.com", role="admin", must_change_password=0)
 
@@ -603,13 +610,14 @@ def seed_dummy_data():
         notes="Needs short breaks during lessons."
     )
 
-    # Pick teachers for lessons
-    # Admin also has a teacher profile, so teacher1_user_id can be used as teacher_id.
+    # Lessons for the current month
+    # These use date.today() so the dummy data stays useful instead of becoming outdated.
+
     if teacher1_user_id and student1_id:
         create_lesson(
             teacher_id=teacher1_user_id,
             student_id=student1_id,
-            lesson_date="2026-07-08",
+            lesson_date=today.isoformat(),
             start_time="09:00",
             end_time="10:00",
             status="scheduled",
@@ -621,7 +629,7 @@ def seed_dummy_data():
         create_lesson(
             teacher_id=teacher2_user_id,
             student_id=student2_id,
-            lesson_date="2026-07-08",
+            lesson_date=today.isoformat(),
             start_time="10:30",
             end_time="11:30",
             status="scheduled",
@@ -633,7 +641,7 @@ def seed_dummy_data():
         create_lesson(
             teacher_id=teacher2_user_id,
             student_id=student3_id,
-            lesson_date="2026-07-09",
+            lesson_date=tomorrow.isoformat(),
             start_time="13:00",
             end_time="14:00",
             status="scheduled",
@@ -645,7 +653,7 @@ def seed_dummy_data():
         create_lesson(
             teacher_id=teacher3_user_id,
             student_id=student4_id,
-            lesson_date="2026-07-10",
+            lesson_date=two_days_later.isoformat(),
             start_time="15:00",
             end_time="16:00",
             status="completed",
@@ -657,7 +665,7 @@ def seed_dummy_data():
         create_lesson(
             teacher_id=teacher3_user_id,
             student_id=student5_id,
-            lesson_date="2026-07-11",
+            lesson_date=three_days_later.isoformat(),
             start_time="11:00",
             end_time="12:00",
             status="scheduled",
@@ -665,7 +673,20 @@ def seed_dummy_data():
             notes="Try shorter activities with breaks between sections."
         )
 
+    if teacher2_user_id and student1_id:
+        create_lesson(
+            teacher_id=teacher2_user_id,
+            student_id=student1_id,
+            lesson_date=next_week.isoformat(),
+            start_time="09:00",
+            end_time="10:00",
+            status="scheduled",
+            location="Parent Home",
+            notes="Review progress and continue reading confidence exercises."
+        )
+
     print("Dummy data inserted.")
+
 
 def reset_dummy_data():
     connection, cursor = create_connection()

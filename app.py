@@ -164,7 +164,7 @@ def dashboard():
 
     connection, cursor = create_connection()
 
-    cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, students.first_name, students.last_name, lessons.status, lessons.location, lessons.notes FROM lessons JOIN students ON lessons.student_id = students.student_id WHERE lessons.teacher_id = ? ORDER BY lessons.lesson_date, lessons.start_time", (session["user_id"],))
+    cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, students.first_name, students.last_name, lessons.status, lessons.location, lessons.notes FROM lessons JOIN students ON lessons.student_id = students.student_id WHERE lessons.teacher_id = ? AND lessons.lesson_date = ? ORDER BY lessons.start_time", (session["user_id"], today))
     lessons = cursor.fetchall()
     connection.close()
 
@@ -324,6 +324,16 @@ def admin():
     if blocked:
         return blocked
 
+    current_time = datetime.now().strftime("%I:%M %p").lstrip("0")
+    today_date = date.today()
+    today = today_date.isoformat()
+    display_today = today_date.strftime("%B %d, %Y")
+
+    if today_date.month == 12:
+        next_month_start = date(today_date.year + 1, 1, 1)
+    else:
+        next_month_start = date(today_date.year, today_date.month + 1, 1)
+
     connection, cursor = create_connection()
 
     cursor.execute("SELECT COUNT(*) FROM lessons")
@@ -335,14 +345,10 @@ def admin():
     cursor.execute("SELECT COUNT(*) FROM students WHERE is_active = 1")
     student_count = cursor.fetchone()[0]
 
-    cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, teachers.first_name, teachers.last_name, students.first_name, students.last_name, lessons.status, lessons.location FROM lessons JOIN teachers ON lessons.teacher_id = teachers.user_id JOIN students ON lessons.student_id = students.student_id ORDER BY lessons.lesson_date, lessons.start_time LIMIT 5")
+    cursor.execute("SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time, teachers.first_name, teachers.last_name, students.first_name, students.last_name, lessons.status, lessons.location FROM lessons JOIN teachers ON lessons.teacher_id = teachers.user_id JOIN students ON lessons.student_id = students.student_id WHERE lessons.lesson_date >= ? AND lessons.lesson_date < ? ORDER BY lessons.lesson_date, lessons.start_time LIMIT 5", (today, next_month_start.isoformat()))
     upcoming_lessons = cursor.fetchall()
 
     connection.close()
-
-    current_time = datetime.now().strftime("%I:%M %p").lstrip("0")
-    today = date.today().isoformat()
-    display_today = date.today().strftime("%B %d, %Y")
 
     return render_template("admin.html", lesson_count=lesson_count, teacher_count=teacher_count, student_count=student_count, upcoming_lessons=upcoming_lessons, today=display_today, current_time=current_time)
 
