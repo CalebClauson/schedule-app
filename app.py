@@ -642,6 +642,36 @@ def admin_create_lesson():
         students=students
     )
 
+@app.route("/admin/teachers/<int:user_id>/reset-password", methods=["POST"])
+def admin_reset_teacher_password(user_id):
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    if user_id == session["user_id"]:
+        flash("Use Change Password to update your own password.")
+        return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
+    temporary_password = request.form["temporary_password"]
+    confirm_password = request.form["confirm_password"]
+
+    if temporary_password != confirm_password:
+        flash("Temporary passwords do not match.")
+        return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
+    if len(temporary_password) < 6:
+        flash("Temporary password must be at least 6 characters.")
+        return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
+    updated = update_user_password(user_id, temporary_password, must_change_password=1)
+
+    if not updated:
+        flash("Could not reset password.")
+        return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
+    flash("Temporary password set. Teacher must change it after login.")
+    return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
 
 
 if __name__ == "__main__":

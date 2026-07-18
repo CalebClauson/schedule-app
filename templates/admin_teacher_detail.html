@@ -40,66 +40,80 @@
 
         {% else %}
             <h1>Teacher Detail</h1>
-        
+    
             <div class="page-actions-top">
                 <a class="button button-small" href="{{ url_for('admin_teachers') }}">
                     ← Back to Teachers
                 </a>
             </div>
-        
+    
             <div class="schedule-card detail-card">
                 <div class="detail-header">
                     <div>
                         <h2>{{ teacher[1] }} {{ teacher[2] }}</h2>
                         <p class="detail-subtitle">Teacher account details</p>
                     </div>
-        
+    
                     <div class="detail-header-actions">
                         <span class="role-badge">{{ teacher[6] | title }}</span>
-        
+    
                         <a class="button button-small" href="{{ url_for('admin_teacher_detail', user_id=teacher[0], edit=1) }}">
                             Edit Teacher
                         </a>
                     </div>
                 </div>
-        
+    
                 <div class="detail-grid">
                     <div class="detail-item">
                         <span>User ID</span>
                         <strong>{{ teacher[0] }}</strong>
                     </div>
-        
+    
                     <div class="detail-item">
                         <span>Phone</span>
                         <strong>{{ teacher[3] }}</strong>
                     </div>
-        
+    
                     <div class="detail-item">
                         <span>Max Students</span>
                         <strong>{{ teacher[4] }}</strong>
                     </div>
-        
+    
                     <div class="detail-item">
                         <span>Role</span>
                         <strong>{{ teacher[6] | title }}</strong>
                     </div>
-        
+    
                     <div class="detail-item detail-wide">
                         <span>Notes</span>
                         <strong>{{ teacher[5] }}</strong>
                     </div>
                 </div>
-        
+    
+                <div class="danger-zone">
+                    <p class="danger-title">Password Reset</p>
+                    <p class="danger-text">Set a temporary password for this teacher. They will be forced to change it after logging in.</p>
+    
+                    <form method="POST" action="{{ url_for('admin_reset_teacher_password', user_id=teacher[0]) }}">
+                        <label>Temporary Password</label>
+                        <input type="password" name="temporary_password" required>
+    
+                        <label>Confirm Temporary Password</label>
+                        <input type="password" name="confirm_password" required>
+    
+                        <button type="submit">Reset Password</button>
+                    </form>
+                </div>
+    
                 <div class="danger-zone">
                     <p class="danger-title">Danger Zone</p>
                     <p class="danger-text">Deactivate this teacher account without deleting their history.</p>
-        
+    
                     <form method="POST" action="{{ url_for('admin_deactivate_teacher', user_id=teacher[0]) }}" onsubmit="return confirm('Deactivate this teacher?');">
                         <button class="button-danger" type="submit">Deactivate Teacher</button>
                     </form>
                 </div>
             </div>
         {% endif %}
-
 </div>
 {% endblock %}
