@@ -2,7 +2,7 @@ from venv import create
 
 from datetime import date, datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role
+from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role, create_user, create_teacher, create_student, create_lesson, get_user_by_username, update_lesson_status
 import sqlite3
 
 # zed isnt understanding we HAVE Flask
@@ -185,6 +185,29 @@ def lesson_detail(lesson_id):
         students=students,
         edit_mode=edit_mode
     )
+
+#Update Lesson Status
+@app.route("/lessons/<int:lesson_id>/status", methods=["POST"])
+def update_lesson_status_route(lesson_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if not user_can_access_lesson(lesson_id):
+        return "Not authorized", 403
+
+    status = request.form["status"]
+
+    if status not in ["scheduled", "completed", "canceled"]:
+        return "Invalid status", 400
+
+    updated = update_lesson_status(lesson_id, status)
+
+    if not updated:
+        flash("Could not update lesson status.")
+        return redirect(url_for("lesson_detail", lesson_id=lesson_id))
+
+    flash("Lesson status updated.")
+    return redirect(url_for("lesson_detail", lesson_id=lesson_id))
 
 # POST ROUTE to UPDATE lesson notes
 @app.route("/lessons/<int:lesson_id>/notes", methods=["POST"])
@@ -419,6 +442,143 @@ def admin_deactivate_student(student_id):
         return "Could not deactivate student.", 400
 
     return redirect(url_for("admin_students"))
+
+@app.route("/admin/students/new", methods=["GET", "POST"])
+def admin_create_student():
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    if request.method == "POST":
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        parent_first_name = request.form["parent_first_name"]
+        parent_last_name = request.form["parent_last_name"]
+        parent_email = request.form["parent_email"]
+        birth_date = request.form["birth_date"]
+        parent_phone = request.form["parent_phone"]
+        notes = request.form["notes"]
+
+        created_student = create_student(
+            first_name,
+            last_name,
+            parent_first_name,
+            parent_last_name,
+            parent_email,
+            birth_date,
+            parent_phone,
+            notes
+        )
+
+        if not created_student:
+            flash("Could not create student.")
+            return redirect(url_for("admin_create_student"))
+
+        flash("Student created successfully.")
+
+        if type(created_student) is int:
+            return redirect(url_for("admin_student_detail", student_id=created_student))
+
+        return redirect(url_for("admin_students"))
+
+    return render_template("admin_student_create.html")
+
+@app.route("/admin/teachers/new", methods=["GET", "POST"])
+def admin_create_teacher():
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        email = request.form["email"]
+        role = request.form["role"]
+
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        phone = request.form["phone"]
+        max_students = request.form["max_students"]
+        notes = request.form["notes"]
+
+        created_user = create_user(username, password, email, role)
+
+        if type(created_user) is int:
+            user_id = created_user
+        else:
+            user = get_user_by_username(username)
+            user_id = user[0] if user else None
+
+        if not user_id:
+            flash("Could not create teacher user account.")
+            return redirect(url_for("admin_create_teacher"))
+
+        created_teacher = create_teacher(
+            user_id,
+            first_name,
+            last_name,
+            phone,
+            max_students,
+            notes
+        )
+
+        if not created_teacher:
+            flash("User was created, but teacher profile could not be created.")
+            return redirect(url_for("admin_teachers"))
+
+        flash("Teacher created successfully.")
+        return redirect(url_for("admin_teacher_detail", user_id=user_id))
+
+    return render_template("admin_teacher_create.html")
+
+@app.route("/admin/lessons/new", methods=["GET", "POST"])
+def admin_create_lesson():
+    blocked = admin_required()
+    if blocked:
+        return blocked
+
+    teachers = get_all_teachers()
+    students = get_all_students()
+
+    if request.method == "POST":
+        teacher_id = request.form["teacher_id"]
+        student_id = request.form["student_id"]
+        lesson_date = request.form["lesson_date"]
+        start_time = request.form["start_time"]
+        end_time = request.form["end_time"]
+        status = request.form["status"]
+        location = request.form["location"]
+        notes = request.form["notes"]
+
+        created_lesson = create_lesson(
+            teacher_id,
+            student_id,
+            lesson_date,
+            start_time,
+            end_time,
+            status,
+            location,
+            notes
+        )
+
+        if not created_lesson:
+            flash("Could not create lesson. Teacher may already be booked or at max lessons for the day.")
+            return redirect(url_for("admin_create_lesson"))
+
+        flash("Lesson created successfully.")
+
+        if type(created_lesson) is int:
+            return redirect(url_for("lesson_detail", lesson_id=created_lesson))
+
+        return redirect(url_for("admin_lessons"))
+
+    return render_template(
+        "admin_lesson_create.html",
+        teachers=teachers,
+        students=students
+    )
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

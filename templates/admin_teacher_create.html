@@ -1,0 +1,63 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Create Teacher{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    <h1>Create Teacher</h1>
+
+    <div class="page-actions-top">
+        <a class="button button-small" href="{{ url_for('admin_teachers') }}">
+            ← Back to Teachers
+        </a>
+    </div>
+
+    <div class="schedule-card detail-card">
+        <div class="detail-header">
+            <div>
+                <h2>New Teacher</h2>
+                <p class="detail-subtitle">Create a login account and teacher profile.</p>
+            </div>
+
+            <span class="role-badge">Creating</span>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_create_teacher') }}">
+
+            <label>Username</label>
+            <input type="text" name="username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <label>Email</label>
+            <input type="email" name="email" required>
+
+            <label>Role</label>
+            <select name="role" required>
+                <option value="teacher">Teacher</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <label>First Name</label>
+            <input type="text" name="first_name" required>
+
+            <label>Last Name</label>
+            <input type="text" name="last_name" required>
+
+            <label>Phone</label>
+            <input type="text" name="phone">
+
+            <label>Max Students</label>
+            <input type="number" name="max_students" value="10" required>
+
+            <label>Notes</label>
+            <textarea name="notes" rows="6"></textarea>
+
+            <button type="submit">Create Teacher</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

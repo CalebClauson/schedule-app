@@ -20,7 +20,13 @@
                 <p class="detail-subtitle">View student records and parent contact information.</p>
             </div>
 
-            <span class="role-badge">{{ students|length }} Students</span>
+            <div class="detail-header-actions">
+                <span class="role-badge">{{ students|length }} Students</span>
+
+                <a class="button button-small" href="{{ url_for('admin_create_student') }}">
+                    Create Student
+                </a>
+            </div>
         </div>
 
         {% if students %}

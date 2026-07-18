@@ -1,0 +1,73 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Create Lesson{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    <h1>Create Lesson</h1>
+
+    <div class="page-actions-top">
+        <a class="button button-small" href="{{ url_for('admin_lessons') }}">
+            ← Back to Lessons
+        </a>
+    </div>
+
+    <div class="schedule-card detail-card">
+        <div class="detail-header">
+            <div>
+                <h2>New Lesson</h2>
+                <p class="detail-subtitle">Schedule a lesson for a teacher and student.</p>
+            </div>
+
+            <span class="role-badge">Creating</span>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_create_lesson') }}">
+
+            <label>Teacher</label>
+            <select name="teacher_id" required>
+                {% for teacher in teachers %}
+                    <option value="{{ teacher[0] }}">
+                        {{ teacher[1] }} {{ teacher[2] }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label>Student</label>
+            <select name="student_id" required>
+                {% for student in students %}
+                    <option value="{{ student[0] }}">
+                        {{ student[1] }} {{ student[2] }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label>Date</label>
+            <input type="date" name="lesson_date" required>
+
+            <label>Start Time</label>
+            <input type="time" name="start_time" required>
+
+            <label>End Time</label>
+            <input type="time" name="end_time" required>
+
+            <label>Status</label>
+            <select name="status" required>
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="canceled">Canceled</option>
+            </select>
+
+            <label>Location</label>
+            <input type="text" name="location" value="Teaching Center" required>
+
+            <label>Lesson Notes</label>
+            <textarea name="notes" rows="6"></textarea>
+
+            <button type="submit">Create Lesson</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

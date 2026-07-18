@@ -151,6 +151,20 @@
                     <strong>{{ lesson[14] | format_date }}</strong>
                 </div>
             </div>
+
+            {% if lesson[4] == "scheduled" %}
+                <div class="action-row">
+                    <form method="POST" action="{{ url_for('update_lesson_status_route', lesson_id=lesson[0]) }}">
+                        <input type="hidden" name="status" value="completed">
+                        <button type="submit">Mark Complete</button>
+                    </form>
+
+                    <form method="POST" action="{{ url_for('update_lesson_status_route', lesson_id=lesson[0]) }}" onsubmit="return confirm('Cancel this lesson?');">
+                        <input type="hidden" name="status" value="canceled">
+                        <button class="button-danger" type="submit">Cancel Lesson</button>
+                    </form>
+                </div>
+            {% endif %}
         </div>
 
         <div class="schedule-card detail-card">

@@ -20,7 +20,13 @@
                 <p class="detail-subtitle">View teacher accounts and teacher profile details.</p>
             </div>
 
-            <span class="role-badge">{{ teachers|length }} Teachers</span>
+            <div class="detail-header-actions">
+                <span class="role-badge">{{ teachers|length }} Teachers</span>
+
+                <a class="button button-small" href="{{ url_for('admin_create_teacher') }}">
+                    Create Teacher
+                </a>
+            </div>
         </div>
 
         {% if teachers %}

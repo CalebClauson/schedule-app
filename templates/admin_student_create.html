@@ -1,0 +1,57 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Create Student{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    <h1>Create Student</h1>
+
+    <div class="page-actions-top">
+        <a class="button button-small" href="{{ url_for('admin_students') }}">
+            ← Back to Students
+        </a>
+    </div>
+
+    <div class="schedule-card detail-card">
+        <div class="detail-header">
+            <div>
+                <h2>New Student</h2>
+                <p class="detail-subtitle">Add a new student and parent contact information.</p>
+            </div>
+
+            <span class="role-badge">Creating</span>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_create_student') }}">
+
+            <label>First Name</label>
+            <input type="text" name="first_name" required>
+
+            <label>Last Name</label>
+            <input type="text" name="last_name" required>
+
+            <label>Parent First Name</label>
+            <input type="text" name="parent_first_name" required>
+
+            <label>Parent Last Name</label>
+            <input type="text" name="parent_last_name" required>
+
+            <label>Parent Email</label>
+            <input type="email" name="parent_email" required>
+
+            <label>Birth Date</label>
+            <input type="date" name="birth_date" required>
+
+            <label>Parent Phone</label>
+            <input type="text" name="parent_phone" required>
+
+            <label>Notes</label>
+            <textarea name="notes" rows="6"></textarea>
+
+            <button type="submit">Create Student</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

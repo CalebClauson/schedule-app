@@ -20,7 +20,13 @@
                 <p class="detail-subtitle">View all scheduled lessons in the system.</p>
             </div>
 
-            <span class="role-badge">{{ lessons|length }} Lessons</span>
+            <div class="detail-header-actions">
+                <span class="role-badge">{{ lessons|length }} Lessons</span>
+
+                <a class="button button-small" href="{{ url_for('admin_create_lesson') }}">
+                    Create Lesson
+                </a>
+            </div>
         </div>
 
         {% if lessons %}
