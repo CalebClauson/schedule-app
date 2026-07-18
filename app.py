@@ -1,8 +1,6 @@
-from venv import create
-
 from datetime import date, datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role, create_user, create_teacher, create_student, create_lesson, get_user_by_username, update_lesson_status
+from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role, create_user, create_teacher, create_student, create_lesson, get_user_by_username, update_lesson_status, update_user_password, edit_student_notes
 import sqlite3
 
 # zed isnt understanding we HAVE Flask
@@ -23,7 +21,7 @@ def login():
         conn = sqlite3.connect("schedule_app.db")
         cursor = conn.cursor()
 
-        cursor.execute("""SELECT user_id, username, password_hash, email, role, is_active FROM users WHERE username = ?""", (username,))
+        cursor.execute("SELECT user_id, username, password_hash, email, role, is_active, must_change_password FROM users WHERE username = ?", (username,))
 
         user = cursor.fetchone()
         conn.close()
@@ -38,9 +36,14 @@ def login():
             session["user_id"] = user[0]
             session["username"] = user[1]
             session["role"] = user[4]
+            session["must_change_password"] = user[6]
+
+            if user[6] == 1:
+                return redirect(url_for("change_password"))
+
             if session["role"] == "admin":
                 return redirect(url_for("admin"))
-            
+
             return redirect(url_for("dashboard"))
 
     return render_template("login.html", error=error)
@@ -85,6 +88,15 @@ def format_time(value):
     time_object = datetime.strptime(value, "%H:%M")
     return time_object.strftime("%I:%M %p").lstrip("0")
 
+#Protection Route
+@app.before_request
+def force_password_change():
+    allowed_routes = ["login", "logout", "change_password", "static"]
+
+    if "user_id" in session and session.get("must_change_password") == 1:
+        if request.endpoint not in allowed_routes:
+            return redirect(url_for("change_password"))
+
 # Logout route
 # Clears the current user session and sends them back to the login page.
 @app.route("/logout")
@@ -92,6 +104,51 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
+# Password Change Route
+@app.route("/change-password", methods=["GET", "POST"])
+def change_password():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    error = None
+
+    if request.method == "POST":
+        current_password = request.form["current_password"]
+        new_password = request.form["new_password"]
+        confirm_password = request.form["confirm_password"]
+
+        conn = sqlite3.connect("schedule_app.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT password_hash FROM users WHERE user_id = ?", (session["user_id"],))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user is None:
+            error = "User account not found."
+        elif not verify_password(user[0], current_password):
+            error = "Current password is incorrect."
+        elif new_password != confirm_password:
+            error = "New passwords do not match."
+        elif len(new_password) < 6:
+            error = "Password must be at least 6 characters."
+        elif current_password == new_password:
+            error = "New password cannot be the same as your current password."
+        else:
+            updated = update_user_password(session["user_id"], new_password, must_change_password=0)
+
+            if not updated:
+                error = "Could not update password."
+            else:
+                session["must_change_password"] = 0
+                flash("Password updated successfully.")
+
+                if session.get("role") == "admin":
+                    return redirect(url_for("admin"))
+
+                return redirect(url_for("dashboard"))
+
+    return render_template("change_password.html", error=error)
+    
 # Dashboard page
 # This is the main page users see after they log in successfully.
 # If no user_id exists in the session, the user is not logged in,
@@ -101,6 +158,7 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    current_time = datetime.now().strftime("%I:%M %p").lstrip("0")
     today = date.today().isoformat()
     display_today = date.today().strftime("%B %d, %Y")
 
@@ -110,7 +168,7 @@ def dashboard():
     lessons = cursor.fetchall()
     connection.close()
 
-    return render_template("dashboard.html", username=session["username"], lessons=lessons, today=display_today)
+    return render_template("dashboard.html", username=session["username"], lessons=lessons, today=display_today, current_time=current_time)
 
 
 # Lesson detail page
@@ -215,6 +273,9 @@ def update_notes(lesson_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    if not user_can_access_lesson(lesson_id):
+        return "Not authorized", 403
+
     notes = request.form["notes"]
 
     updated = update_lesson_notes(lesson_id, notes)
@@ -230,9 +291,12 @@ def update_student_notes_route(student_id, lesson_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    if not user_can_access_lesson(lesson_id):
+        return "Not authorized", 403
+
     notes = request.form["student_notes"]
 
-    updated = update_student_notes(student_id, notes)
+    updated = edit_student_notes(student_id, notes)
 
     if not updated:
         return "Could not update student notes", 404
@@ -276,11 +340,11 @@ def admin():
 
     connection.close()
 
+    current_time = datetime.now().strftime("%I:%M %p").lstrip("0")
     today = date.today().isoformat()
     display_today = date.today().strftime("%B %d, %Y")
 
-    return render_template(
-        "admin.html", lesson_count=lesson_count, teacher_count=teacher_count, student_count=student_count, upcoming_lessons=upcoming_lessons, today = display_today)
+    return render_template("admin.html", lesson_count=lesson_count, teacher_count=teacher_count, student_count=student_count, upcoming_lessons=upcoming_lessons, today=display_today, current_time=current_time)
 
 @app.route("/admin/lessons")
 def admin_lessons():
@@ -501,7 +565,7 @@ def admin_create_teacher():
         max_students = request.form["max_students"]
         notes = request.form["notes"]
 
-        created_user = create_user(username, password, email, role)
+        created_user = create_user(username, password, email, role, must_change_password=1)
 
         if type(created_user) is int:
             user_id = created_user

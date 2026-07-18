@@ -37,8 +37,8 @@ def create_db():
     # user_id, username, password_hash, email, role, is_active, created_date
     # is_active, 1=active | 0=inactive
     create_users_table = """CREATE TABLE IF NOT EXISTS
-    users(user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password_hash TEXT, email TEXT UNIQUE, role TEXT DEFAULT 'teacher', is_active INTEGER DEFAULT 1, created_date TEXT DEFAULT CURRENT_TIMESTAMP)"""
-
+    users(user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password_hash TEXT, email TEXT UNIQUE, role TEXT DEFAULT 'teacher', is_active INTEGER DEFAULT 1, must_change_password INTEGER DEFAULT 0, created_date TEXT DEFAULT CURRENT_TIMESTAMP)"""
+    
     # user_id, first_name, last_name, phone, max_students, notes
     create_teachers_table = """CREATE TABLE IF NOT EXISTS
     teachers(user_id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, phone TEXT, max_students INTEGER DEFAULT 10, notes TEXT, FOREIGN KEY(user_id) REFERENCES users(user_id))"""
@@ -74,12 +74,12 @@ def create_connection():
 # USERS TABLE
 # ============================
 
-def create_user(username, password, email, role='teacher', is_active=1):
+def create_user(username, password, email, role='teacher', is_active=1, must_change_password=0):
     connection, cursor = create_connection()
     password_hash = hash_password(password)
 
     try:
-        cursor.execute("INSERT INTO users(username, password_hash, email, role, is_active) VALUES (?, ?, ?, ?, ?)", (username, password_hash, email, role, is_active))
+        cursor.execute("INSERT INTO users(username, password_hash, email, role, is_active, must_change_password) VALUES (?, ?, ?, ?, ?, ?)", (username, password_hash, email, role, is_active, must_change_password))
         user_id = cursor.lastrowid
         connection.commit()
         return user_id
@@ -123,21 +123,21 @@ def edit_user(user_id, username, password_hash, email, role, is_active):
 
 def get_user_by_id(user_id):
     connection, cursor = create_connection()
-    cursor.execute("""SELECT user_id, username, email, role, is_active FROM users WHERE user_id=?""", (user_id,))
+    cursor.execute("SELECT user_id, username, email, role, is_active, must_change_password FROM users WHERE user_id = ?", (user_id,))
     user = cursor.fetchone()
     connection.close()
     return user
 
 def get_user_by_username(username):
     connection, cursor = create_connection()
-    cursor.execute("""SELECT user_id, username, email, role, is_active FROM users WHERE username=?""", (username,))
+    cursor.execute("SELECT user_id, username, password_hash, email, role, is_active, must_change_password FROM users WHERE username = ?", (username,))
     user = cursor.fetchone()
     connection.close()
     return user
 
 def return_all_users():
     connection, cursor = create_connection()
-    cursor.execute("""SELECT user_id, username, email, role, is_active FROM users""")
+    cursor.execute("SELECT user_id, username, email, role, is_active, must_change_password FROM users")
     users = cursor.fetchall()
     for user in users:
         print(f"ID: {user[0]}")
@@ -145,6 +145,7 @@ def return_all_users():
         print(f"Email: {user[2]}")
         print(f"Role: {user[3]}")
         print(f"Active: {user[4]}")
+        print(f"Must Change Password: {user[5]}")
         print("-" * 30)
     connection.close()
 
@@ -162,6 +163,22 @@ def update_user_role(user_id, role):
 
     return updated > 0
 
+def update_user_password(user_id, password, must_change_password=0):
+    connection, cursor = create_connection()
+    password_hash = hash_password(password)
+    cursor.execute("UPDATE users SET password_hash = ?, must_change_password = ? WHERE user_id = ?", (password_hash, must_change_password, user_id))
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    return updated > 0
+
+def update_must_change_password(user_id, must_change_password):
+    connection, cursor = create_connection()
+    cursor.execute("UPDATE users SET must_change_password = ? WHERE user_id = ?", (must_change_password, user_id))
+    updated = cursor.rowcount
+    connection.commit()
+    connection.close()
+    return updated > 0
 
 # ============================
 # TEACHERS TABLE
@@ -493,26 +510,11 @@ def seed_dummy_data():
     """
 
     # Create teacher users first
-    teacher1_user_id = create_user(
-        username="admin",
-        password="test123",
-        email="admin@email.com",
-        role="admin"
-    )
+    teacher1_user_id = create_user(username="admin", password="test123", email="admin@email.com", role="admin", must_change_password=0)
 
-    teacher2_user_id = create_user(
-        username="teacher1",
-        password="test123",
-        email="teacher1@email.com",
-        role="teacher"
-    )
+    teacher2_user_id = create_user(username="teacher1", password="test123", email="teacher1@email.com", role="teacher", must_change_password=1)
 
-    teacher3_user_id = create_user(
-        username="teacher2",
-        password="test123",
-        email="teacher2@email.com",
-        role="teacher"
-    )
+    teacher3_user_id = create_user(username="teacher2", password="test123", email="teacher2@email.com", role="teacher", must_change_password=1)
 
     # Create teacher profiles only if users were created successfully
     if teacher1_user_id:
