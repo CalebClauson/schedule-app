@@ -340,8 +340,12 @@ def weekly_schedule():
         })
 
     time_slots = []
+    
     for hour in range(8, 21):
         time_slots.append(f"{hour:02d}:00")
+    
+        if hour != 20:
+            time_slots.append(f"{hour:02d}:30")
 
     schedule_grid = {}
 
