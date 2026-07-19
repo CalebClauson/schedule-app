@@ -1,0 +1,90 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Weekly Schedule{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    <h1>Weekly Schedule</h1>
+
+    <div class="page-actions-top">
+        {% if session.get("role") == "admin" %}
+            <a class="button button-small" href="{{ url_for('admin') }}">
+                ← Back to Admin
+            </a>
+        {% else %}
+            <a class="button button-small" href="{{ url_for('dashboard') }}">
+                ← Back to Dashboard
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="schedule-card weekly-card">
+        <div class="detail-header">
+            <div>
+                <h2>{{ week_label }}</h2>
+                <p class="detail-subtitle">View scheduled lessons by day and time.</p>
+            </div>
+
+            <div class="detail-header-actions">
+                <a class="button button-small" href="{{ url_for('weekly_schedule', week=week_offset - 1) }}">
+                    Previous Week
+                </a>
+
+                <a class="button button-small" href="{{ url_for('weekly_schedule', week=week_offset + 1) }}">
+                    Next Week
+                </a>
+            </div>
+        </div>
+
+        <table class="schedule-table weekly-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+
+                    {% for day in days %}
+                        <th>
+                            {{ day.label }}<br>
+                            <span class="table-subtitle">{{ day.short }}</span>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for slot in time_slots %}
+                <tr>
+                    <td class="time-column">{{ slot | format_time }}</td>
+
+                    {% for day in days %}
+                    <td>
+                        {% set cell_lessons = schedule_grid[slot][day.date] %}
+
+                        {% if cell_lessons %}
+                            {% for lesson in cell_lessons %}
+                                <div class="timetable-lesson">
+                                    <strong>{{ lesson[8] }} {{ lesson[9] }}</strong>
+                                    <span>{{ lesson[2] | format_time }} - {{ lesson[3] | format_time }}</span>
+
+                                    {% if session.get("role") == "admin" %}
+                                        <span>Teacher: {{ lesson[6] }} {{ lesson[7] }}</span>
+                                    {% endif %}
+
+                                    <a href="{{ url_for('lesson_detail', lesson_id=lesson[0], return_to='weekly', week=week_offset) }}">
+                                        View
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <span class="empty-slot">—</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

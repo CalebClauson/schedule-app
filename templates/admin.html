@@ -90,8 +90,14 @@
                 <h2>Lesson Preview</h2>
                 <p class="detail-subtitle">Upcoming lessons across all teachers.</p>
             </div>
-
-            <span class="role-badge">{{ upcoming_lessons|length }} Showing</span>
+        
+            <div class="detail-header-actions">
+                <span class="role-badge">{{ upcoming_lessons|length }} Showing</span>
+        
+                <a class="button button-small" href="{{ url_for('weekly_schedule') }}">
+                    Weekly Schedule
+                </a>
+            </div>
         </div>
 
         {% if upcoming_lessons %}
@@ -130,7 +136,7 @@
                         <td>{{ lesson[9] }}</td>
 
                         <td>
-                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], return_to='admin') }}">
                                 View
                             </a>
                         </td>

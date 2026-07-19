@@ -5,11 +5,14 @@
 {% block body %}
 <div class="page">
 
+    {% set return_to = request.args.get("return_to", "dashboard") %}
+    {% set week_offset = request.args.get("week", 0) %}
+
     {% if edit_mode %}
         <h1>Edit Lesson</h1>
 
         <div class="page-actions-top">
-            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], return_to=return_to, week=week_offset) }}">
                 ← Cancel Edit
             </a>
         </div>
@@ -24,7 +27,7 @@
                 <span class="role-badge">Editing</span>
             </div>
 
-            <form method="POST" action="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}" class="inline-edit-form">
+            <form method="POST" action="{{ url_for('lesson_detail', lesson_id=lesson[0], return_to=return_to, week=week_offset) }}" class="inline-edit-form">
 
                 <label>Teacher</label>
                 <select name="teacher_id" required>
@@ -74,10 +77,21 @@
         <h1>Lesson Detail</h1>
 
         <div class="page-actions-top">
-            {% if session.get("role") == "admin" %}
+            {% if return_to == "weekly" %}
+                <a class="button button-small" href="{{ url_for('weekly_schedule', week=week_offset) }}">
+                    ← Back to Weekly Schedule
+                </a>
+
+            {% elif return_to == "admin_lessons" %}
+                <a class="button button-small" href="{{ url_for('admin_lessons') }}">
+                    ← Back to All Lessons
+                </a>
+
+            {% elif return_to == "admin" %}
                 <a class="button button-small" href="{{ url_for('admin') }}">
                     ← Back to Admin
                 </a>
+
             {% else %}
                 <a class="button button-small" href="{{ url_for('dashboard') }}">
                     ← Back to Dashboard
@@ -98,7 +112,7 @@
                     </span>
 
                     {% if session.get("role") == "admin" %}
-                        <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], edit=1) }}">
+                        <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], edit=1, return_to=return_to, week=week_offset) }}">
                             Edit Lesson
                         </a>
                     {% endif %}
@@ -154,12 +168,12 @@
 
             {% if lesson[4] == "scheduled" %}
                 <div class="action-row">
-                    <form method="POST" action="{{ url_for('update_lesson_status_route', lesson_id=lesson[0]) }}">
+                    <form method="POST" action="{{ url_for('update_lesson_status_route', lesson_id=lesson[0], return_to=return_to, week=week_offset) }}">
                         <input type="hidden" name="status" value="completed">
                         <button type="submit">Mark Complete</button>
                     </form>
 
-                    <form method="POST" action="{{ url_for('update_lesson_status_route', lesson_id=lesson[0]) }}" onsubmit="return confirm('Cancel this lesson?');">
+                    <form method="POST" action="{{ url_for('update_lesson_status_route', lesson_id=lesson[0], return_to=return_to, week=week_offset) }}" onsubmit="return confirm('Cancel this lesson?');">
                         <input type="hidden" name="status" value="canceled">
                         <button class="button-danger" type="submit">Cancel Lesson</button>
                     </form>
@@ -175,7 +189,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ url_for('update_notes', lesson_id=lesson[0]) }}">
+            <form method="POST" action="{{ url_for('update_notes', lesson_id=lesson[0], return_to=return_to, week=week_offset) }}">
                 <textarea name="notes" rows="6" required>{{ lesson[6] }}</textarea>
                 <button type="submit">Save Notes</button>
             </form>
@@ -189,7 +203,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ url_for('update_student_notes_route', student_id=lesson[7], lesson_id=lesson[0]) }}">
+            <form method="POST" action="{{ url_for('update_student_notes_route', student_id=lesson[7], lesson_id=lesson[0], return_to=return_to, week=week_offset) }}">
                 <textarea name="student_notes" rows="6" required>{{ lesson[15] }}</textarea>
                 <button type="submit">Save Student Notes</button>
             </form>

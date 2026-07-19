@@ -61,7 +61,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0]) }}">
+                            <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0], return_to='admin_students') }}">
                                 View
                             </a>
                         </td>

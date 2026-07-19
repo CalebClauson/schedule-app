@@ -35,7 +35,15 @@
                 <p class="detail-subtitle">Your scheduled lessons for today.</p>
             </div>
 
-            <span class="role-badge">{{ lessons|length }} Lessons</span>
+            <div class="detail-header-actions">
+                <span class="role-badge">
+                    {{ lessons|length }} Lessons
+                </span>
+
+                <a class="button button-small" href="{{ url_for('weekly_schedule') }}">
+                    Weekly Schedule
+                </a>
+            </div>
         </div>
 
         {% if lessons %}
@@ -77,7 +85,7 @@
                         </td>
 
                         <td>
-                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], return_to='dashboard') }}">
                                 View
                             </a>
                         </td>

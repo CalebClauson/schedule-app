@@ -5,11 +5,13 @@
 {% block body %}
 <div class="page">
 
+    {% set return_to = request.args.get("return_to", "admin_students") %}
+
     {% if edit_mode %}
         <h1>Edit Student</h1>
 
         <div class="page-actions-top">
-            <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0]) }}">
+            <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0], return_to=return_to) }}">
                 ← Cancel Edit
             </a>
         </div>
@@ -24,7 +26,7 @@
                 <span class="role-badge">Editing</span>
             </div>
 
-            <form method="POST" action="{{ url_for('admin_student_detail', student_id=student[0]) }}">
+            <form method="POST" action="{{ url_for('admin_student_detail', student_id=student[0], return_to=return_to) }}">
 
                 <label>First Name</label>
                 <input type="text" name="first_name" value="{{ student[1] }}" required>
@@ -58,9 +60,15 @@
         <h1>Student Detail</h1>
 
         <div class="page-actions-top">
-            <a class="button button-small" href="{{ url_for('admin_students') }}">
-                ← Back to Students
-            </a>
+            {% if return_to == "admin" %}
+                <a class="button button-small" href="{{ url_for('admin') }}">
+                    ← Back to Admin
+                </a>
+            {% else %}
+                <a class="button button-small" href="{{ url_for('admin_students') }}">
+                    ← Back to Students
+                </a>
+            {% endif %}
         </div>
 
         <div class="schedule-card detail-card">
@@ -73,7 +81,7 @@
                 <div class="detail-header-actions">
                     <span class="role-badge">Student</span>
 
-                    <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0], edit=1) }}">
+                    <a class="button button-small" href="{{ url_for('admin_student_detail', student_id=student[0], edit=1, return_to=return_to) }}">
                         Edit Student
                     </a>
                 </div>

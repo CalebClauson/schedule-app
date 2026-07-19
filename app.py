@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role, create_user, create_teacher, create_student, create_lesson, get_user_by_username, update_lesson_status, update_user_password, edit_student_notes
 import sqlite3
@@ -314,6 +314,90 @@ def schedule():
 
     return render_template("schedule.html")
 
+
+# Weekly Time Table
+@app.route("/weekly-schedule")
+def weekly_schedule():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    week_offset = int(request.args.get("week", 0))
+
+    today_date = date.today()
+    start_of_week = today_date - timedelta(days=today_date.weekday())
+    start_of_week = start_of_week + timedelta(weeks=week_offset)
+    end_of_week = start_of_week + timedelta(days=6)
+
+    week_label = f"{start_of_week.strftime('%B %d').replace(' 0', ' ')} - {end_of_week.strftime('%B %d, %Y').replace(' 0', ' ')}"
+
+    days = []
+    for i in range(7):
+        current_day = start_of_week + timedelta(days=i)
+        days.append({
+            "date": current_day.strftime("%Y-%m-%d"),
+            "label": current_day.strftime("%A"),
+            "short": current_day.strftime("%b %d")
+        })
+
+    time_slots = []
+    for hour in range(8, 21):
+        time_slots.append(f"{hour:02d}:00")
+
+    schedule_grid = {}
+
+    for slot in time_slots:
+        schedule_grid[slot] = {}
+        for day in days:
+            schedule_grid[slot][day["date"]] = []
+
+    connection, cursor = create_connection()
+
+    if session.get("role") == "admin":
+        cursor.execute("""
+            SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time,
+                lessons.status, lessons.location,
+                teachers.first_name, teachers.last_name,
+                students.first_name, students.last_name
+            FROM lessons
+            JOIN teachers ON lessons.teacher_id = teachers.user_id
+            JOIN students ON lessons.student_id = students.student_id
+            WHERE lessons.lesson_date BETWEEN ? AND ?
+            ORDER BY lessons.lesson_date, lessons.start_time
+        """, (start_of_week.strftime("%Y-%m-%d"), end_of_week.strftime("%Y-%m-%d")))
+    else:
+        cursor.execute("""
+            SELECT lessons.lesson_id, lessons.lesson_date, lessons.start_time, lessons.end_time,
+                   lessons.status, lessons.location,
+                   teachers.first_name, teachers.last_name,
+                   students.first_name, students.last_name
+            FROM lessons
+            JOIN teachers ON lessons.teacher_id = teachers.user_id
+            JOIN students ON lessons.student_id = students.student_id
+            WHERE lessons.teacher_id = ?
+            AND lessons.lesson_date BETWEEN ? AND ?
+            ORDER BY lessons.lesson_date, lessons.start_time
+        """, (session["user_id"], start_of_week.strftime("%Y-%m-%d"), end_of_week.strftime("%Y-%m-%d")))
+
+    lessons = cursor.fetchall()
+    connection.close()
+
+    for lesson in lessons:
+        lesson_date = lesson[1]
+        start_time = lesson[2][:5]
+
+        if start_time in schedule_grid and lesson_date in schedule_grid[start_time]:
+            schedule_grid[start_time][lesson_date].append(lesson)
+
+    return render_template(
+        "weekly_schedule.html",
+        days=days,
+        time_slots=time_slots,
+        schedule_grid=schedule_grid,
+        week_offset=week_offset,
+        start_of_week=start_of_week,
+        end_of_week=end_of_week,
+        week_label=week_label
+    )
 
 # Admin page
 # This page is for admin-related tools, such as managing users,

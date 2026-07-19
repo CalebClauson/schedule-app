@@ -59,7 +59,7 @@
                         </td>
                         <td>{{ lesson[9] }}</td>
                         <td>
-                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}">
+                            <a class="button button-small" href="{{ url_for('lesson_detail', lesson_id=lesson[0], return_to='admin_lessons') }}">
                                 View
                             </a>
                         </td>
