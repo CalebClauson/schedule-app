@@ -329,6 +329,15 @@ The seeded teacher accounts have `must_change_password = 1`, so they should be f
 
 The seeded admin account has `must_change_password = 0`, so it can log in normally.
 
+## Test Data
+
+This project includes a seed script for adding larger development data.
+
+To run the test data script:
+
+```bash
+python seed_large_test_data.py
+
 ## Current Workflow
 
 Admin flow:
