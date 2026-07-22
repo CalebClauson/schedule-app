@@ -1,6 +1,6 @@
 # Schedule App
 
-This project is still under active development, but the main MVP features are now working.
+This project is a completed MVP scheduling system with room for future improvements.
 
 The app is a Flask and SQLite scheduling system built to manage teachers, students, lessons, notes, and admin-controlled accounts. It now has a working login system, password hashing, protected routes, teacher dashboards, admin management pages, create/edit flows, lesson status updates, and a forced password change system for new or reset teacher accounts.
 
@@ -57,7 +57,7 @@ Current features and structure include:
 - Schedule conflict checking
 - Buffer time between lessons
 - Conflict checks for lesson edits, time changes, and teacher reassignment
-- Dummy seed data for testing
+- Large seed script for testing
 - Login page
 - Session-based login flow
 - Protected dashboard, schedule, lesson detail, and admin routes
@@ -198,14 +198,15 @@ schedule-app/
 │   ├── dashboard.html
 │   ├── lesson_detail.html
 │   ├── login.html
-│   └── schedule.html
+│   ├── schedule.html
+│   └── weekly_schedule.html
 ├── .gitignore
 ├── app.py
 ├── database.py
 ├── helpers.py
+├── seed_large_test_data.py
 ├── README.md
-├── requirements.txt
-└── schedule_app.db
+└── requirements.txt
 ```
 
 ## Database Tables
@@ -292,7 +293,8 @@ pip install -r requirements.txt
 Create and seed the database:
 
 ```bash
-python -c "from database import create_db, seed_dummy_data; create_db(); seed_dummy_data()"
+python -c python -c "from database import create_db; create_db()"
+python seed_large_test_data.py
 ```
 
 Run the Flask app:
@@ -337,6 +339,9 @@ To run the test data script:
 
 ```bash
 python seed_large_test_data.py
+```
+
+The seed script adds sample teachers, students, and lessons for testing the dashboard, admin pages, weekly schedule, and lesson navigation.
 
 ## Current Workflow
 
@@ -375,7 +380,7 @@ Current limitations:
 - No recurring lesson system yet
 - No parent account system
 - No search or filter tools yet
-- No real calendar view yet
+- No drag-and-drop calendar interface yet
 - No advanced password strength rules yet
 - No full audit log yet
 

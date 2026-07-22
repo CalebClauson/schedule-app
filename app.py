@@ -2,12 +2,14 @@ from datetime import date, datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import create_connection, update_lesson_notes, verify_password, edit_lesson, get_lesson_by_id, get_all_teachers, get_all_students, edit_teacher, get_teacher_by_id, deactivate_user, edit_student, get_student_by_id, deactivate_student, update_user_role, create_user, create_teacher, create_student, create_lesson, get_user_by_username, update_lesson_status, update_user_password, edit_student_notes
 import sqlite3
+import os
 
 # zed isnt understanding we HAVE Flask
 
 app = Flask(__name__)
-#secret key needs to be changed later | random secure value
-app.secret_key = "dev-secret-key"
+# Uses an environment variable for the Flask secret key.
+# The fallback value is only for local development.
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key-change-me")
 
 #login scheme with hashing
 @app.route("/login", methods=["GET", "POST"])
