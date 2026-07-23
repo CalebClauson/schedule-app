@@ -214,7 +214,9 @@ def edit_teacher(user_id, first_name, last_name, phone, max_students, notes):
 
 def get_all_teachers():
     connection, cursor = create_connection()
-    cursor.execute("""SELECT teachers.user_id, teachers.first_name, teachers.last_name, teachers.phone, teachers.max_students, teachers.notes FROM teachers JOIN users ON teachers.user_id = users.user_id WHERE users.is_active = 1""")
+    cursor.execute("""SELECT teachers.user_id, teachers.first_name, teachers.last_name, teachers.phone, teachers.max_students, teachers.notes FROM teachers JOIN users ON teachers.user_id = users.user_id WHERE users.is_active = 1 ORDER BY  teachers.last_name ASC,
+    teachers.first_name ASC,
+    teachers.user_id ASC""")
     teachers = cursor.fetchall()
     connection.close()
     return teachers

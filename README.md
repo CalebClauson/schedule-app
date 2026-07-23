@@ -200,6 +200,10 @@ schedule-app/
 │   ├── login.html
 │   ├── schedule.html
 │   └── weekly_schedule.html
+├── tests/
+│   ├── __init__.py
+│   ├── runtests.md
+│   └── test_database.py
 ├── .gitignore
 ├── app.py
 ├── database.py
@@ -342,6 +346,17 @@ python seed_large_test_data.py
 ```
 
 The seed script adds sample teachers, students, and lessons for testing the dashboard, admin pages, weekly schedule, and lesson navigation.
+
+## Testing
+
+The project includes 57 automated tests built with pytest.
+
+The test suite covers authentication, database CRUD operations, scheduling
+conflicts, buffer-time validation, teacher capacity limits, foreign-key
+constraints, and lesson-management behavior.
+
+```bash
+python -m pytest -v
 
 ## Current Workflow
 
