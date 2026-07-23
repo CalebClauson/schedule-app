@@ -357,6 +357,7 @@ constraints, and lesson-management behavior.
 
 ```bash
 python -m pytest -v
+```
 
 ## Current Workflow
 
